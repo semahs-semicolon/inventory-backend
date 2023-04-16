@@ -73,6 +73,11 @@ class LocationService {
     }
 
     suspend fun createLocation(parentId: String, x: Int, y: Int, width: Int, height: Int, name: String): SimpleLocationWithLocation {
+        require(width > 0) {"Width should be positive"}
+        require( height > 0) {"Height should be positive"}
+        require(x >= 0) {"X should be non negative"}
+        require(y >= 0) {"Y should be non negative"}
+
         var location = Location(x = x, y = y, width = width, height = height, name = name, parentId = parentId.toULong().toLong())
         location = locationRepository.save(location);
 

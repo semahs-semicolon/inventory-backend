@@ -1,5 +1,8 @@
 package io.seda.inventory.controller
 
+import io.seda.inventory.data.Location
+import io.seda.inventory.services.ItemService
+import io.seda.inventory.services.LocationService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
@@ -10,33 +13,58 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import io.seda.inventory.services.UserService
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/locations")
 class LocationController {
     @Autowired
-    lateinit var userService: UserService;
+    lateinit var locationService: LocationService;
+    @Autowired
+    lateinit var itemService: ItemService;
 
-    data class RegistrationRequest(val username: String, val password: String, val nickname: String);
-
-    @PostMapping("/signup", consumes = [MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE])
-    suspend fun signup(@RequestPart("request") registrationRequest: RegistrationRequest): String {
-        return userService.register(registrationRequest.username, registrationRequest.password, registrationRequest.nickname,);
+    @GetMapping("")
+    suspend fun getAllLocations(): List<LocationService.TreeLocation> {
+        return locationService.getLocations();
     }
 
+    data class LocationCreateRequest(val name: String, val x: Int, val y: Int, val width: Int, val height: Int, val parent: String)
 
-    data class NicknameChangeRequest(val nickname: String);
-    @PutMapping("/nickname")
-    @PreAuthorize("isAuthenticated()")
-    suspend fun changeNickname(@RequestBody nicknameChangeRequest: NicknameChangeRequest): String {
-        return userService.changeName(nicknameChangeRequest.nickname);
+    @PostMapping("")
+    suspend fun createLocation(request: LocationCreateRequest): LocationService.SimpleLocationWithLocation {
+        return locationService.createLocation(
+            parentId = request.parent,
+            x = request.x,
+            y = request.y,
+            width = request.width,
+            height = request.height,
+            name = request.name
+        )
     }
 
-    data class PasswordChangeRequest(val oldPassword: String, val newPassword: String);
+    data class LocationNameChangeRequest(val name: String)
 
-    @PutMapping("/password")
-    @PreAuthorize("isAuthenticated()")
-    suspend fun changePassword(@RequestBody passwordChangeRequest: PasswordChangeRequest) {
-        userService.changePassword(passwordChangeRequest.oldPassword, passwordChangeRequest.newPassword);
+    @PutMapping("/{id}/name")
+    suspend fun changeLocationName(@PathVariable("id") id: String, request: LocationNameChangeRequest): LocationService.SimpleLocationWithLocation {
+        return locationService.renameLocation(id, request.name);
     }
+
+    @DeleteMapping("/{id}")
+    suspend fun deleteLocation(@PathVariable("id") id: String) {
+        return locationService.deleteLocation(id);
+    }
+
+    @GetMapping("/{id}/items")
+    suspend fun getItems(@PathVariable("id") id: String): List<ItemService.InjectableItem> {
+        return itemService.findItemsByLocation(id)
+    }
+
+    @PatchMapping("/layout")
+    suspend fun updateLayout(request: List<LocationService.LayoutUpdateRequest>): List<LocationService.TreeLocation> {
+        return locationService.updateLayout(request);
+    }
+
 }
