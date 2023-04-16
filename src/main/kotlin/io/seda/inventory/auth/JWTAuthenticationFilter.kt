@@ -1,4 +1,4 @@
-package team.mistake.rlhfbackend.auth
+package io.seda.inventory.auth
 
 import io.seda.inventory.auth.JWTUserDetails
 import io.seda.inventory.services.JWTService

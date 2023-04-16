@@ -1,4 +1,4 @@
-package team.mistake.rlhfbackend.configuration
+package io.seda.inventory.configuration
 
 import io.r2dbc.postgresql.PostgresqlConnectionConfiguration
 import io.r2dbc.postgresql.PostgresqlConnectionFactory

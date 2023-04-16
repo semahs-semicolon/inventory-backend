@@ -1,4 +1,4 @@
-package team.mistake.rlhfbackend.auth
+package io.seda.inventory.auth
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

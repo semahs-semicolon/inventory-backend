@@ -1,7 +1,8 @@
-package team.mistake.rlhfbackend.auth
-
+package io.seda.inventory.auth
 
 import io.seda.inventory.auth.FullUserDetails
+import io.seda.inventory.auth.HttpExceptionFactory.badRequest
+import io.seda.inventory.auth.HttpExceptionFactory.unauthorized
 import io.seda.inventory.auth.JWTUserDetails
 import io.seda.inventory.auth.UserPrincipal
 import kotlinx.coroutines.reactive.awaitFirstOrNull
@@ -20,8 +21,6 @@ import org.springframework.security.web.server.authentication.ServerAuthenticati
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
-import team.mistake.rlhfbackend.auth.HttpExceptionFactory.badRequest
-import team.mistake.rlhfbackend.auth.HttpExceptionFactory.unauthorized
 import io.seda.inventory.services.JWTService
 
 data class LoginRequest(val username: String, val password: String);

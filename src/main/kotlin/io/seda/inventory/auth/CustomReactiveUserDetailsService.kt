@@ -1,4 +1,4 @@
-package team.mistake.rlhfbackend.auth
+package io.seda.inventory.auth
 
 import io.seda.inventory.auth.FullUserDetails
 import io.seda.inventory.data.UserRepository

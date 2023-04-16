@@ -1,4 +1,4 @@
-package team.mistake.rlhfbackend.configuration
+package io.seda.inventory.configuration
 
 import com.auth0.jwt.algorithms.Algorithm
 import org.springframework.beans.factory.annotation.Value
