@@ -26,6 +26,14 @@ class ProductService {
             .map { it.toSimpleProduct() }
     }
 
+    suspend fun updateProduct(id: String, name: String, description: String): SimpleProduct {
+        var loc = productRepository.findById(id.toULong().toLong()) ?: throw NotFoundException("product with id $id not found")
+        loc.name = name;
+        loc.description = description;
+        loc = productRepository.save(loc);
+        return loc.toSimpleProduct();
+    }
+
     suspend fun createProduct(name: String, description: String): SimpleProduct {
         var product = Product(name = name, description = description);
         product = productRepository.save(product);
