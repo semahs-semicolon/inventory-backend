@@ -1,0 +1,17 @@
+package io.seda.inventory.data
+
+import org.springframework.data.relational.core.mapping.Table
+import org.springframework.data.repository.kotlin.CoroutineCrudRepository
+
+@Table(name = "users")
+data class User(
+    var id: Long? = null,
+    val username: String,
+    var password: String,
+    var nickname: String,
+    var authority: List<String> = listOf()
+)
+
+interface UserRepository: CoroutineCrudRepository<User, Long> {
+    suspend fun findByUsername(username: String): User?;
+}

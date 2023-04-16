@@ -1,0 +1,16 @@
+server.port: 8080
+
+database:
+  database: seda
+  schema: inventory
+  username: inventory_system
+  password: asdasd
+  port: 5432
+  hostname: localhost
+
+jwt:
+  public:
+  private:
+  random: true
+
+generatorId: 1
