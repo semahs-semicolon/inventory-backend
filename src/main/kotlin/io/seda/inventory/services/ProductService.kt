@@ -15,27 +15,31 @@ class ProductService {
     @Autowired lateinit var productRepository: ProductRepository;
     @Autowired lateinit var databaseClient: DatabaseClient // well FTS and stuff lol.
 
-    data class SimpleProduct(val id: String, val name: String, val description: String?);
+    data class SimpleProduct(val id: String, val name: String, val description: String?, val primaryImage: String?);
     fun Product.toSimpleProduct(): SimpleProduct {
-        return SimpleProduct(id?.toULong().toString(), name, description);
+        return SimpleProduct(id?.toULong().toString(), name, description, primaryImage);
     }
 
     suspend fun getProducts(page: Int, count: Int, search: String): Flow<SimpleProduct> {
         val pageRequest: PageRequest = PageRequest.of(page, count)
-        return productRepository.findAllProducts(search, pageRequest)
+        return productRepository.findAllProducts("%$search%", pageRequest)
             .map { it.toSimpleProduct() }
     }
 
-    suspend fun updateProduct(id: String, name: String, description: String): SimpleProduct {
+    suspend fun updateProduct(id: String, name: String, description: String, imageId: String?): SimpleProduct {
         var loc = productRepository.findById(id.toULong().toLong()) ?: throw NotFoundException("product with id $id not found")
         loc.name = name;
         loc.description = description;
+        loc.images = loc.images.filter { !it.equals(loc.primaryImage) }.toMutableList()
+        if (imageId != null)
+            loc.images.add(imageId)
+        loc.primaryImage = imageId;
         loc = productRepository.save(loc);
         return loc.toSimpleProduct();
     }
 
-    suspend fun createProduct(name: String, description: String): SimpleProduct {
-        var product = Product(name = name, description = description);
+    suspend fun createProduct(name: String, description: String, imageId: String?): SimpleProduct {
+        var product = Product(name = name, description = description, primaryImage = imageId, images = arrayOf(imageId).toList().filterNotNull().toMutableList());
         product = productRepository.save(product);
         return product.toSimpleProduct();
     }

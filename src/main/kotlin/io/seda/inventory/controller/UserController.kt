@@ -20,7 +20,7 @@ class UserController {
     data class RegistrationRequest(val username: String, val password: String, val nickname: String);
 
     @PostMapping("/signup", consumes = [MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE])
-    suspend fun signup(@RequestPart("request") registrationRequest: RegistrationRequest): String {
+    suspend fun signup(@RequestBody registrationRequest: RegistrationRequest): String {
         return userService.register(registrationRequest.username, registrationRequest.password, registrationRequest.nickname,);
     }
 

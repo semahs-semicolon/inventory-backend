@@ -14,3 +14,6 @@ jwt:
   random: true
 
 generatorId: 1
+
+image:
+  path: ./images

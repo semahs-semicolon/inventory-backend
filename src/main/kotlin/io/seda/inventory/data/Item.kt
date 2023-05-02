@@ -22,24 +22,25 @@ data class Item(@Id var id: Long? = null, val productId: Long, var locationId: L
 interface ItemRepository: CoroutineCrudRepository<Item, Long> {
     @Query("SELECT * from inventory.item_view WHERE location_id = :location")
     fun findAllByLocation(location: Long): Flow<Item>
-    @Query("SELECT * from inventory.item_view WHERE product_ud = :product")
+    @Query("SELECT * from inventory.item_view WHERE product_id = :product")
     fun findAllByProduct(product: Long): Flow<Item>
 }
 
 @ReadingConverter
 object ItemReadConverter : Converter<Row, Item?> {
     override fun convert(source: Row): Item {
-        val product: ProductService.SimpleProduct? = if (source.get("product_name") != null) {
-            ProductService.SimpleProduct((source.get("product_id") as Long).toULong().toString(), source.get("product_name") as String, source.get("product_description") as String?)
+
+        val product: ProductService.SimpleProduct? = if (source.metadata.contains("product_name")) {
+            ProductService.SimpleProduct((source.get("product_id") as Long).toULong().toString(), source.get("product_name") as String, null, source.get("product_primary_image") as String?)
         } else null;
-        val location: LocationService.SimpleLocation? = if (source.get("location_name") != null) {
+        val location: LocationService.SimpleLocation? = if (source.metadata.contains("location_name")) {
             LocationService.SimpleLocation((source.get("location_id") as Long).toULong().toString(), source.get("location_name") as String)
         } else null;
         return Item(
             id = source.get("id") as Long,
             productId =  source.get("product_id") as Long,
             locationId =  source.get("location_id") as Long,
-            count = (source.get("count") as Long).toInt(),
+            count = source.get("count") as Int,
             product = product,
             location = location
         )

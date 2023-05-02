@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestParam
 
 @RestController
 @RequestMapping("/locations")
@@ -31,10 +32,15 @@ class LocationController {
         return locationService.getLocations();
     }
 
-    data class LocationCreateRequest(val name: String, val x: Int, val y: Int, val width: Int, val height: Int, val parent: String)
+    @GetMapping("/tree")
+    suspend fun getLocationTreeSpecific(@RequestParam("id") id: String): LocationService.TreeLocation {
+        return locationService.getLocation(id)
+    }
+
+    data class LocationCreateRequest(val name: String, val x: Int, val y: Int, val width: Int, val height: Int, val parent: String?)
 
     @PostMapping("")
-    suspend fun createLocation(request: LocationCreateRequest): LocationService.SimpleLocationWithLocation {
+    suspend fun createLocation(@RequestBody request: LocationCreateRequest): LocationService.SimpleLocationWithLocation {
         return locationService.createLocation(
             parentId = request.parent,
             x = request.x,
@@ -48,7 +54,7 @@ class LocationController {
     data class LocationNameChangeRequest(val name: String)
 
     @PutMapping("/{id}/name")
-    suspend fun changeLocationName(@PathVariable("id") id: String, request: LocationNameChangeRequest): LocationService.SimpleLocationWithLocation {
+    suspend fun changeLocationName(@PathVariable("id") id: String, @RequestBody request: LocationNameChangeRequest): LocationService.SimpleLocationWithLocation {
         return locationService.renameLocation(id, request.name);
     }
 
@@ -62,8 +68,18 @@ class LocationController {
         return itemService.findItemsByLocation(id)
     }
 
+    data class BackgroundSetRequest(val imageId: String?);
+    @PutMapping("/{id}/background")
+    suspend fun saveBackground(@PathVariable("id") id: String, @RequestBody request: BackgroundSetRequest): LocationService.SimpleLocationWithLocation {
+        return locationService.setBackgroundId(id, request.imageId)
+    }
+    @GetMapping("/{id}")
+    suspend fun getItem(@PathVariable("id") id: String): LocationService.SimpleLocation {
+        return locationService.getSimpleLocation(id)
+    }
+
     @PatchMapping("/layout")
-    suspend fun updateLayout(request: List<LocationService.LayoutUpdateRequest>): List<LocationService.TreeLocation> {
+    suspend fun updateLayout(@RequestBody request: List<LocationService.LayoutUpdateRequest>): List<LocationService.TreeLocation> {
         return locationService.updateLayout(request);
     }
 

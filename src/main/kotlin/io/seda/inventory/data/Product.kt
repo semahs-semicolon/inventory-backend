@@ -8,9 +8,9 @@ import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 @Table(name = "products")
-data class Product(@Id var id: Long? = null, var name: String, var description: String)
+data class Product(@Id var id: Long? = null, var name: String, var description: String, var primaryImage: String?, var images: MutableList<String> = mutableListOf())
 
 interface ProductRepository: CoroutineCrudRepository<Product, Long> {
-    @Query("SELECT * FROM products WHERE name LIKE %:search%")
+    @Query("SELECT * FROM products WHERE name LIKE :search")
     fun findAllProducts(search: String, pageable: Pageable): Flow<Product>
 }

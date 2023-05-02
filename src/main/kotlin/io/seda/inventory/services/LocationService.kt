@@ -21,15 +21,16 @@ class LocationService {
         id: String,
         name: String,
         val x: Int, val y: Int, val width: Int, val height: Int,
-        val parent: String?
+        val parent: String?,
+        val backgroundId: String?
     ): SimpleLocation(id, name);
 
     fun Location.toSimpleLocation(): SimpleLocationWithLocation {
-        return SimpleLocationWithLocation(id?.toULong().toString(), name, x ,y, width, height, parentId?.toULong()?.toString())
+        return SimpleLocationWithLocation(id?.toULong().toString(), name, x ,y, width, height, parentId?.toULong()?.toString(), backgroundId)
     }
 
     fun SimpleLocationWithLocation.toTreeLocation(): TreeLocation {
-        return TreeLocation(id, name, x, y, width, height, mutableListOf());
+        return TreeLocation(id, name, x, y, width, height, mutableListOf(), backgroundId);
     }
 
 
@@ -37,7 +38,8 @@ class LocationService {
         val id: String,
         val name: String,
         val x: Int, val y: Int, val width: Int, val height: Int,
-        val children: MutableList<TreeLocation>
+        val children: MutableList<TreeLocation>,
+        val backgroundId: String?
     )
 
     private suspend fun createLocationMap(): Pair<Map<String, TreeLocation>, Set<String>> {
@@ -72,13 +74,13 @@ class LocationService {
         return locationRepository.findById(locationId.toULong().toLong())?.toSimpleLocation() ?: throw NotFoundException("Loaction with id $locationId not found")
     }
 
-    suspend fun createLocation(parentId: String, x: Int, y: Int, width: Int, height: Int, name: String): SimpleLocationWithLocation {
+    suspend fun createLocation(parentId: String?, x: Int, y: Int, width: Int, height: Int, name: String): SimpleLocationWithLocation {
         require(width > 0) {"Width should be positive"}
         require( height > 0) {"Height should be positive"}
         require(x >= 0) {"X should be non negative"}
         require(y >= 0) {"Y should be non negative"}
 
-        var location = Location(x = x, y = y, width = width, height = height, name = name, parentId = parentId.toULong().toLong())
+        var location = Location(x = x, y = y, width = width, height = height, name = name, parentId = parentId?.toULong()?.toLong(), backgroundId = null)
         location = locationRepository.save(location);
 
         return location.toSimpleLocation()
@@ -88,6 +90,13 @@ class LocationService {
         var loc = locationRepository.findById(locationId.toULong().toLong()) ?: throw NotFoundException("Location with id $locationId not found");
         loc.name = name;
         loc = locationRepository.save(loc);
+        return loc.toSimpleLocation()
+    }
+
+    suspend fun setBackgroundId(locationId: String, backgroundId: String?): SimpleLocationWithLocation {
+        var loc = locationRepository.findById(locationId.toULong().toLong()) ?: throw NotFoundException("Location with id $locationId not found")
+        loc.backgroundId = backgroundId
+        loc = locationRepository.save(loc)
         return loc.toSimpleLocation()
     }
 
@@ -119,7 +128,7 @@ class LocationService {
             .map { it.id to it }
             .toList().toMap()
         val parentIdList = parentList.map { it.value.id }.toSet()
-        val shouldBeEmpty = checkExist.filter { parentIdList.contains(it) }
+        val shouldBeEmpty = checkExist.filter { !parentIdList.contains(it) }
         require(shouldBeEmpty.isEmpty()) {"Some of Ids do not exist: ${shouldBeEmpty}"}
 
         val editing = parentList.filter { requestIds.contains(it.key) }
@@ -136,7 +145,7 @@ class LocationService {
             }
         }
 
-        locationRepository.saveAll(editing.values);
+        locationRepository.saveAll(editing.values).toList();
 
         val toValidate = locationRepository.findAll()
             .map { it.toSimpleLocation() }
@@ -150,7 +159,7 @@ class LocationService {
             while(true) {
                 if (current.parent == null) break
                 chain = "${current.id} - $chain"
-                check(current.parent == it.locationId) {"Circular Location Detected!!! $chain"}
+                check(current.parent != it.locationId) {"Circular Location Detected!!! $chain"}
                 current = checkNotNull(toValidate[current.parent]) {"Missing node? ${current.parent} Current chain: $chain"}
             }
         }

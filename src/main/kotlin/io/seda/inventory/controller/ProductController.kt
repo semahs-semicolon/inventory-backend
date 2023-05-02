@@ -4,14 +4,7 @@ import io.seda.inventory.services.ItemService
 import io.seda.inventory.services.ProductService
 import kotlinx.coroutines.flow.Flow
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PatchMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/products")
@@ -21,17 +14,17 @@ class ProductController {
     @Autowired
     lateinit var itemService: ItemService;
 
-    @GetMapping("/")
+    @GetMapping("")
     suspend fun search(@RequestParam("search") search: String, @RequestParam("size") size: Int, @RequestParam("page") page: Int): Flow<ProductService.SimpleProduct> {
         val result = productService.getProducts(page, size, search);
         return result;
     }
 
-    data class ProductCreationRequest(val name: String, val description: String);
+    data class ProductCreationRequest(val name: String, val imageId: String?, val description: String);
 
-    @PostMapping("/")
-    suspend fun create(request: ProductCreationRequest): ProductService.SimpleProduct {
-        return productService.createProduct(request.name, request.description);
+    @PostMapping("")
+    suspend fun create(@RequestBody request: ProductCreationRequest): ProductService.SimpleProduct {
+        return productService.createProduct(request.name, request.description, request.imageId);
     }
 
     @DeleteMapping("/{id}")
@@ -40,8 +33,8 @@ class ProductController {
     }
 
     @PatchMapping("/{id}")
-    suspend fun update(@PathVariable("id") id: String, request: ProductCreationRequest): ProductService.SimpleProduct {
-        return productService.updateProduct(id, request.name, request.description);
+    suspend fun update(@PathVariable("id") id: String, @RequestBody request: ProductCreationRequest): ProductService.SimpleProduct {
+        return productService.updateProduct(id, request.name, request.description, request.imageId);
     }
 
     @GetMapping("/{id}")
