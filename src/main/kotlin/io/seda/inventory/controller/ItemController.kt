@@ -7,10 +7,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/items")
 class ItemController {
-    // CREATE, DELETE, UPDATE
-
     @Autowired lateinit var itemService: ItemService;
-
 
     data class ItemCreationRequest(val productId: String, val locationId: String, val count: Int);
     @PostMapping("")
@@ -28,5 +25,11 @@ class ItemController {
     @PutMapping("/{id}/count")
     suspend fun setCount(@PathVariable("id") id: String, @RequestBody request: SetCountRequest): ItemService.InjectableItem {
         return itemService.setCount(id, request.count);
+    }
+
+    data class ItemMoveRequest(val itemId: String, val locationId: String, val count: Int);
+    @PatchMapping("/move")
+    suspend fun move(@RequestBody request: ItemMoveRequest): ItemService.InjectableItem {
+        return itemService.move(request.itemId, request.locationId, request.count);
     }
 }

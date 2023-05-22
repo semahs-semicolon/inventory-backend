@@ -62,6 +62,17 @@ class ItemService {
         return item.toInjectableItem();
     }
 
+    suspend fun move(itemId: String, locationId: String, count: Int): InjectableItem {
+        var item = itemRepository.findById(itemId.toULong().toLong()) ?: throw NotFoundException("Item with id $itemId not found")
+        if (!locationService.locationExists(locationId.toULong().toLong()))throw NotFoundException("Location with id $locationId not found")
+        require(count > 0) {"Count must be positive"}
+        require(item.count > count) {"Not enough products in item ($count > ${item.count})"}
+
+        item.count -= count;
+        itemRepository.save(item)
+        return createItem(item.productId.toULong().toString(), locationId, count)
+    }
+
     suspend fun findItemsByLocation(locationId: String): List<InjectableItem> {
         return itemRepository.findAllByLocation(location = locationId.toULong().toLong()).map { it.toInjectableItem() }
             .toList();
@@ -71,5 +82,6 @@ class ItemService {
         return itemRepository.findAllByProduct(product = productId.toULong().toLong()).map { it.toInjectableItem() }
             .toList();
     }
+
 
 }
