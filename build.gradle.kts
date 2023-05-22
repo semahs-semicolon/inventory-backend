@@ -5,11 +5,12 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.0"
 	kotlin("jvm") version "1.8.10"
 	kotlin("plugin.spring") version "1.8.10"
+	id("com.palantir.docker") version "0.22.1"
 }
 
 group = "io.seda"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_18
 
 configurations {
 	compileOnly {
@@ -21,6 +22,15 @@ repositories {
 	mavenCentral()
 	maven { url = uri("https://repo.spring.io/milestone") }
 }
+
+
+docker {
+	name = "${project.name}:${project.version}"
+	files(tasks.bootJar.get().outputs)
+	tag("dgRegistry", "registry.dungeons.guide/seda-inventory-backend:${project.version}")
+	setDockerfile( file("Dockerfile") )
+}
+
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -40,12 +50,15 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.springframework.security:spring-security-test")
+	implementation(platform("software.amazon.awssdk:bom:2.17.133"))
+	implementation("software.amazon.awssdk:s3")
+	implementation("software.amazon.awssdk:netty-nio-client")
 }
 
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict")
-		jvmTarget = "17"
+		jvmTarget = "18"
 	}
 }
 

@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/images")
 class ImageController {
     @Autowired lateinit var imageService: ImageService;
-    @GetMapping("/{id}")
-    suspend fun getImage(@PathVariable id: String): Resource {
-        return imageService.getImage(id);
-    }
+//    @GetMapping("/{id}")
+//    suspend fun getImage(@PathVariable id: String): Resource {
+//        return imageService.getImage(id);
+//    }
 
 //    @PostMapping("", consumes = ["image/png", "image/jpeg", "image/gif", "image/jpg", "image/webp"])
     @PostMapping("")

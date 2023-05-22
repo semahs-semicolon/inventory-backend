@@ -3,6 +3,7 @@ package io.seda.inventory.services
 import io.seda.inventory.data.Item
 import io.seda.inventory.data.ItemRepository
 import io.seda.inventory.exceptions.NotFoundException
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,11 +19,13 @@ class ItemService {
     data class InjectableItem(val id: String, val productId: String, val locationId: String, val count: Int, var product: ProductService.SimpleProduct?, var location: LocationService.SimpleLocation?);
 
     suspend fun InjectableItem.lookupProduct(): InjectableItem {
-        product = productService.getSimpleProduct(productId)
+        if (product == null)
+            product = productService.getSimpleProduct(productId)
         return this
     }
     suspend fun InjectableItem.lookupLocation(): InjectableItem {
-        location = locationService.getSimpleLocation(locationId);
+        if (location == null)
+            location = locationService.getSimpleLocation(locationId);
         return this
     }
 
@@ -37,7 +40,9 @@ class ItemService {
         if (!locationService.locationExists(locationId.toULong().toLong())) throw NotFoundException("Location with id $locationId not found")
         require(count > 0) {"Count must be positive"}
 
-        var item: Item = Item(productId = productId.toULong().toLong(), locationId = locationId.toULong().toLong(), count = count)
+        var item: Item = itemRepository.findAllByLocationAndProduct(locationId.toULong().toLong(), productId.toULong().toLong())
+            .firstOrNull() ?: Item(productId = productId.toULong().toLong(), locationId = locationId.toULong().toLong(), count = 0)
+        item.count += count;
         item = itemRepository.save(item);
         return item.toInjectableItem()
             .lookupProduct()

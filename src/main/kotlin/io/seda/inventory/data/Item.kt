@@ -24,6 +24,8 @@ interface ItemRepository: CoroutineCrudRepository<Item, Long> {
     fun findAllByLocation(location: Long): Flow<Item>
     @Query("SELECT * from inventory.item_view WHERE product_id = :product")
     fun findAllByProduct(product: Long): Flow<Item>
+    @Query("SELECT * from inventory.item_view WHERE product_id = :product AND location_id = :location")
+    fun findAllByLocationAndProduct(location: Long, product: Long): Flow<Item>
 }
 
 @ReadingConverter

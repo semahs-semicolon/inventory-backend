@@ -16,4 +16,7 @@ jwt:
 generatorId: 1
 
 image:
-  path: ./images
+  access-key: 05365oJVq3GIHvxP
+  secret-key: 0dRJR2OgOsoYhZ6TkhVOZb2mre2O6dzv
+  url: https://seda-inventory.kro.kr/s3/
+  bucket: images
