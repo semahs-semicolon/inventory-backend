@@ -7,20 +7,18 @@ import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
-@Table(name = "products")
-data class Product(
+
+@Table(name = "categories")
+data class Category(
     @Id var id: Long? = null,
     var name: String,
     var description: String,
     var primaryImage: String?,
-    var images: MutableList<String> = mutableListOf(),
-    var categoryId: Long? = null,
-    var tags: MutableList<String> = mutableListOf()
+    var parentCategoryId: Long? = null
 )
 
-interface ProductRepository: CoroutineCrudRepository<Product, Long> {
-    @Query("SELECT * FROM products WHERE name LIKE :search")
-    fun findAllProducts(search: String, pageable: Pageable): Flow<Product>
+interface CategoryRepository: CoroutineCrudRepository<Category, Long> {
+    fun findAllByParentCategoryId(parentCategoryId: Long?): Flow<Category>
 
-    fun findAllProductsByCategoryId(categoryId: Long?): Flow<Product>
+    fun search(keyword: String): Flow<Category>
 }

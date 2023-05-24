@@ -20,11 +20,13 @@ class ProductController {
         return result;
     }
 
-    data class ProductCreationRequest(val name: String, val imageId: String?, val description: String);
+    data class ProductCreationRequest(val name: String?, val imageId: String?, val description: String?, val categoryId: String?);
 
     @PostMapping("")
     suspend fun create(@RequestBody request: ProductCreationRequest): ProductService.SimpleProduct {
-        return productService.createProduct(request.name, request.description, request.imageId);
+        requireNotNull(request.name) {"Name can not be null"}
+        requireNotNull(request.description) {"Description can not be null"}
+        return productService.createProduct(request.name, request.description, request.imageId, request.categoryId);
     }
 
     @DeleteMapping("/{id}")
@@ -34,7 +36,7 @@ class ProductController {
 
     @PatchMapping("/{id}")
     suspend fun update(@PathVariable("id") id: String, @RequestBody request: ProductCreationRequest): ProductService.SimpleProduct {
-        return productService.updateProduct(id, request.name, request.description, request.imageId);
+        return productService.updateProduct(id, request.name, request.description, request.imageId, request.categoryId);
     }
 
     @GetMapping("/{id}")
