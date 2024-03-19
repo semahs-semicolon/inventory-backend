@@ -24,7 +24,7 @@ class ImageService {
         val size = minioService.getSizeOfObject(id).awaitSingle();
         val mime = part.headers().contentType?.type;
 
-        return StoredImage(id, "https://seda-inventory.kro.kr/s3/images/${id}", mime, size);
+        return StoredImage(id, "https://inventory.seda.club/s3/images/${id}", mime, size);
     }
 
 //    suspend fun getImage(id: String): Resource {

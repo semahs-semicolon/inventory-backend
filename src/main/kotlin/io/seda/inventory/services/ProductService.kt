@@ -23,7 +23,7 @@ class ProductService {
 
     suspend fun getProducts(page: Int, count: Int, search: String): Flow<SimpleProduct> {
         val pageRequest: PageRequest = PageRequest.of(page, count)
-        return productRepository.findAllProducts("%$search%", pageRequest)
+        return productRepository.findAllProducts("%$search%", pageRequest.offset, pageRequest.pageSize)
             .map { it.toSimpleProduct() }
     }
 

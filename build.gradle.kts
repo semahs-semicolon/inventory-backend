@@ -53,6 +53,7 @@ dependencies {
 	implementation(platform("software.amazon.awssdk:bom:2.17.133"))
 	implementation("software.amazon.awssdk:s3")
 	implementation("software.amazon.awssdk:netty-nio-client")
+	implementation("org.dhatim:fastexcel:0.17.0")
 }
 
 tasks.withType<KotlinCompile> {

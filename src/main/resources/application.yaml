@@ -1,12 +1,12 @@
 server.port: 8080
 
 database:
-  database: seda
+  database: inventory
   schema: inventory
   username: inventory_system
   password: asdasd
   port: 5432
-  hostname: localhost
+  hostname: 172.16.3.156
 
 jwt:
   public:
@@ -16,7 +16,7 @@ jwt:
 generatorId: 1
 
 image:
-  access-key: 05365oJVq3GIHvxP
-  secret-key: 0dRJR2OgOsoYhZ6TkhVOZb2mre2O6dzv
-  url: https://seda-inventory.kro.kr/s3/
+  access-key: 5294b88d9d5f4bb78e02b1dcfc182dc7
+  secret-key: 8eb082fd2aca458b812f133615187791
+  url: https://s4.cloud.seda.club/
   bucket: images

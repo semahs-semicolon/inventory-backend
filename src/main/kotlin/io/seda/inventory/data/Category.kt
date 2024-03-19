@@ -20,5 +20,6 @@ data class Category(
 interface CategoryRepository: CoroutineCrudRepository<Category, Long> {
     fun findAllByParentCategoryId(parentCategoryId: Long?): Flow<Category>
 
+    @Query("SELECT * FROM categories WHERE name LIKE :search")
     fun search(keyword: String): Flow<Category>
 }

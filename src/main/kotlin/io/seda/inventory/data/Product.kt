@@ -19,8 +19,8 @@ data class Product(
 )
 
 interface ProductRepository: CoroutineCrudRepository<Product, Long> {
-    @Query("SELECT * FROM products WHERE name LIKE :search")
-    fun findAllProducts(search: String, pageable: Pageable): Flow<Product>
+    @Query("SELECT * FROM products WHERE name LIKE :search OFFSET :offset LIMIT :limit")
+    fun findAllProducts(search: String, offset: Long, limit: Int): Flow<Product>
 
     fun findAllProductsByCategoryId(categoryId: Long?): Flow<Product>
 }
