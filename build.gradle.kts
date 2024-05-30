@@ -45,7 +45,7 @@ dependencies {
 	implementation("com.auth0:java-jwt:4.3.0")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	implementation("org.postgresql:postgresql")
-	implementation("org.postgresql:r2dbc-postgresql")
+	implementation("org.postgresql:r2dbc-postgresql:1.0.4.RELEASE")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")

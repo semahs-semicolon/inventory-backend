@@ -4,6 +4,7 @@ import io.seda.inventory.services.ItemService
 import io.seda.inventory.services.ProductService
 import kotlinx.coroutines.flow.Flow
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.codec.multipart.Part
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -17,6 +18,14 @@ class ProductController {
     @GetMapping("")
     suspend fun search(@RequestParam("search") search: String, @RequestParam("size") size: Int, @RequestParam("page") page: Int): Flow<ProductService.SimpleProduct> {
         val result = productService.getProducts(page, size, search);
+        return result;
+    }
+
+
+    data class ImageSearchRequest(val embedding: FloatArray, val size: Int, val page: Int)
+    @PostMapping("imageSearch")
+    suspend fun imageSearch(@RequestBody imageSearchRequest: ImageSearchRequest): Flow<ProductService.SimpleProduct> {
+        val result = productService.getProducts(imageSearchRequest.page, imageSearchRequest.size, imageSearchRequest.embedding)
         return result;
     }
 

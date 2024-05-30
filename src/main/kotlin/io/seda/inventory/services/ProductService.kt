@@ -1,12 +1,15 @@
 package io.seda.inventory.services
 
+import io.r2dbc.postgresql.codec.Vector
 import io.seda.inventory.data.Product
 import io.seda.inventory.data.ProductRepository
 import io.seda.inventory.exceptions.NotFoundException
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.event.ApplicationReadyEvent
+import org.springframework.context.event.EventListener
 import org.springframework.data.domain.PageRequest
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Service
@@ -16,9 +19,11 @@ class ProductService {
     @Autowired lateinit var productRepository: ProductRepository;
     @Autowired lateinit var databaseClient: DatabaseClient // well FTS and stuff lol.
 
-    data class SimpleProduct(val id: String, val name: String, val description: String?, val primaryImage: String?);
+    @Autowired lateinit var embeddingService: EmbeddingService;
+
+    data class SimpleProduct(val id: String, val name: String, val description: String?, val primaryImage: String?, val imageEmbedding: FloatArray?);
     fun Product.toSimpleProduct(): SimpleProduct {
-        return SimpleProduct(id?.toULong().toString(), name, description, primaryImage);
+        return SimpleProduct(id?.toULong().toString(), name, description, primaryImage, imageEmbedding);
     }
 
     suspend fun getProducts(page: Int, count: Int, search: String): Flow<SimpleProduct> {
@@ -26,9 +31,16 @@ class ProductService {
         return productRepository.findAllProducts("%$search%", pageRequest.offset, pageRequest.pageSize)
             .map { it.toSimpleProduct() }
     }
+    suspend fun getProducts(page: Int, count: Int, search: FloatArray): Flow<SimpleProduct> {
+//        val pageRequest: PageRequest = PageRequest.of(page, count)
+        return productRepository.findAllProductsByEmbedding(search, count)
+            .map { it.apply { it.imageEmbedding = null }.toSimpleProduct() }
+    }
 
     suspend fun updateProduct(id: String, name: String?, description: String?, imageId: String?, categoryId: String?): SimpleProduct {
         var loc = productRepository.findById(id.toULong().toLong()) ?: throw NotFoundException("product with id $id not found")
+        var imageEmbedding = if (imageId == null)  null else embeddingService.generateEmbedding(imageId)
+
         name?.let {
             loc.name = it
         };
@@ -36,8 +48,10 @@ class ProductService {
             loc.description = it;
         }
         loc.images = loc.images.filter { !it.equals(loc.primaryImage) }.toMutableList()
-        if (imageId != null)
+        if (imageId != null) {
             loc.images.add(imageId)
+            loc.imageEmbedding = imageEmbedding
+        }
         loc.primaryImage = imageId;
         loc.categoryId = categoryId?.toULong()?.toLong();
         loc = productRepository.save(loc);
@@ -45,7 +59,10 @@ class ProductService {
     }
 
     suspend fun createProduct(name: String, description: String, imageId: String?, categoryId: String?): SimpleProduct {
-        var product = Product(name = name, description = description, primaryImage = imageId, images = arrayOf(imageId).toList().filterNotNull().toMutableList(), categoryId = categoryId?.toULong()?.toLong());
+        var imageEmbedding = if (imageId == null) null else embeddingService.generateEmbedding(imageId)
+
+        var product = Product(name = name, description = description, primaryImage = imageId, images = arrayOf(imageId).toList().filterNotNull().toMutableList(), categoryId = categoryId?.toULong()?.toLong()
+            , imageEmbedding =  imageEmbedding);
         product = productRepository.save(product);
         return product.toSimpleProduct();
     }
@@ -68,4 +85,21 @@ class ProductService {
             .map {it.toSimpleProduct()}
             .toList()
     }
+
+
+    @EventListener(ApplicationReadyEvent::class)
+    fun doSomethingAfterStartup() {
+        println("um")
+        runBlocking {
+            productRepository.findAll()
+                .filter { a -> a.imageEmbedding === null && a.primaryImage != null }
+                .map {
+                    println(it)
+                    it.imageEmbedding = embeddingService.generateEmbedding(it.primaryImage ?: "")
+                    it
+                }
+                .map { productRepository.save(it) }.toList()
+        }
+    }
+
 }

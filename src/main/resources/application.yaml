@@ -20,3 +20,6 @@ image:
   secret-key: 8eb082fd2aca458b812f133615187791
   url: https://s4.cloud.seda.club/
   bucket: images
+
+
+embeddingurl: http://172.16.0.191:8080

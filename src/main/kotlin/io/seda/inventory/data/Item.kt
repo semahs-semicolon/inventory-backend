@@ -1,5 +1,6 @@
 package io.seda.inventory.data
 
+import io.r2dbc.postgresql.codec.Vector
 import io.r2dbc.spi.Row
 import io.seda.inventory.services.LocationService
 import io.seda.inventory.services.ProductService
@@ -37,7 +38,7 @@ object ItemReadConverter : Converter<Row, Item?> {
     override fun convert(source: Row): Item {
 
         val product: ProductService.SimpleProduct? = if (source.metadata.contains("product_name")) {
-            ProductService.SimpleProduct((source.get("product_id") as Long).toULong().toString(), source.get("product_name") as String, null, source.get("product_primary_image") as String?)
+            ProductService.SimpleProduct((source.get("product_id") as Long).toULong().toString(), source.get("product_name") as String, null, source.get("product_primary_image") as String?, null)
         } else null;
         val location: LocationService.SimpleLocation? = if (source.metadata.contains("location_name")) {
             LocationService.SimpleLocation((source.get("location_id") as Long).toULong().toString(), source.get("location_name") as String)
@@ -50,5 +51,12 @@ object ItemReadConverter : Converter<Row, Item?> {
             product = product,
             location = location
         )
+    }
+}
+
+@ReadingConverter
+object VectorFloatConverter : Converter<Vector, FloatArray> {
+    override fun convert(source: Vector): FloatArray {
+        return source.vector;
     }
 }

@@ -2,8 +2,11 @@ package io.seda.inventory.configuration
 
 import io.r2dbc.postgresql.PostgresqlConnectionConfiguration
 import io.r2dbc.postgresql.PostgresqlConnectionFactory
+import io.r2dbc.postgresql.codec.BuiltinDynamicCodecs
+import io.r2dbc.postgresql.codec.VectorFloatCodec
 import io.r2dbc.spi.ConnectionFactory
 import io.seda.inventory.data.ItemReadConverter
+import io.seda.inventory.data.VectorFloatConverter
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -33,6 +36,7 @@ class DatabaseConfiguration: AbstractR2dbcConfiguration() {
             .username(username)
             .password(password)
             .database(dbName)
+            .codecRegistrar(BuiltinDynamicCodecs())
             .schema(schema).build()
         return PostgresqlConnectionFactory(config);
     }
@@ -45,6 +49,7 @@ class DatabaseConfiguration: AbstractR2dbcConfiguration() {
     override fun getCustomConverters(): MutableList<Converter<*, *>> {
         val converters: MutableList<Converter<*, *>> = ArrayList()
         converters.add(ItemReadConverter)
+        converters.add(VectorFloatConverter)
         return converters
     }
 }
