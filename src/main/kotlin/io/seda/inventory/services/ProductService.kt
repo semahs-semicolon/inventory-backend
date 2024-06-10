@@ -37,6 +37,13 @@ class ProductService {
             .map { it.apply { it.imageEmbedding = null }.toSimpleProduct() }
     }
 
+    suspend fun getOrphanProducts(page: Int, count: Int): Flow<SimpleProduct> {
+//        val pageRequest: PageRequest = PageRequest.of(page, count)
+        val pageRequest: PageRequest = PageRequest.of(page, count)
+        return productRepository.findAllOrphanProducts(pageRequest.offset, pageRequest.pageSize)
+            .map { it.apply { it.imageEmbedding = null }.toSimpleProduct() }
+    }
+
     suspend fun updateProduct(id: String, name: String?, description: String?, imageId: String?, categoryId: String?): SimpleProduct {
         var loc = productRepository.findById(id.toULong().toLong()) ?: throw NotFoundException("product with id $id not found")
         var imageEmbedding = if (imageId == null)  null else embeddingService.generateEmbedding(imageId)

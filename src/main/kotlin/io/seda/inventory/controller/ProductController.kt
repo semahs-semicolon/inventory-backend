@@ -21,6 +21,11 @@ class ProductController {
         return result;
     }
 
+    @GetMapping("/orphans")
+    suspend fun search(@RequestParam("size") size: Int, @RequestParam("page") page: Int): Flow<ProductService.SimpleProduct> {
+        val result = productService.getOrphanProducts(page, size);
+        return result;
+    }
 
     data class ImageSearchRequest(val embedding: FloatArray, val size: Int, val page: Int)
     @PostMapping("imageSearch")

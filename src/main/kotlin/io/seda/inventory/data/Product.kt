@@ -26,7 +26,8 @@ interface ProductRepository: CoroutineCrudRepository<Product, Long> {
 
     @Query("SELECT * FROM products ORDER BY image_embedding <=> :search LIMIT :limit")
     fun findAllProductsByEmbedding(search: FloatArray, limit: Int): Flow<Product>
-
+    @Query("SELECT * FROM products p LEFT JOIN items i ON p.id = i.product_id WHERE i.id is NULL OFFSET :offset LIMIT :limit")
+    fun findAllOrphanProducts(offset: Long, limit: Int): Flow<Product>
 
     fun findAllProductsByCategoryId(categoryId: Long?): Flow<Product>
 }
