@@ -13,16 +13,16 @@ class CategoryService {
 
     @Autowired
     lateinit var categoryRepository: CategoryRepository;
-    data class SimpleCategory(val id: String, val name: String, val description: String?, val primaryImage: String?, val parentCategoryId: String?);
+    data class SimpleCategory(val categoryId: String, val name: String, val description: String?, val primaryImage: String?, val parentCategoryId: String?);
 
-    data class CategoryWithChild(val id: String, val name: String, val description: String, val primaryImage: String?, val parentCategoryId: String?,
+    data class CategoryWithChild(val categoryId: String, val name: String, val description: String, val primaryImage: String?, val parentCategoryId: String?,
                                  var products: List<ProductService.SimpleProduct>);
 
     fun Category.toSimpleCategory(): SimpleCategory {
-        return SimpleCategory(id?.toULong().toString(), name, description, primaryImage, parentCategoryId?.toULong()?.toString())
+        return SimpleCategory(categoryId?.toULong().toString(), name, description, primaryImage, parentCategoryId?.toULong()?.toString())
     }
     fun Category.toCategoryWithChild(): CategoryWithChild {
-        return CategoryWithChild(id?.toULong().toString(), name, description, primaryImage, parentCategoryId?.toULong()?.toString(), mutableListOf())
+        return CategoryWithChild(categoryId?.toULong().toString(), name, description, primaryImage, parentCategoryId?.toULong()?.toString(), mutableListOf())
     }
 
 
@@ -80,6 +80,7 @@ class CategoryService {
             products = productService.getProductsByCategoryId(id)
         };
     }
+
 
 
 }

@@ -10,7 +10,7 @@ import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 @Table(name = "categories")
 data class Category(
-    @Id var id: Long? = null,
+    @Id var categoryId: Long? = null,
     var name: String,
     var description: String,
     var primaryImage: String?,

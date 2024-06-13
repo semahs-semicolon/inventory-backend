@@ -1,12 +1,10 @@
 package io.seda.inventory.services
 
-import io.r2dbc.postgresql.codec.Vector
 import io.seda.inventory.data.Product
 import io.seda.inventory.data.ProductRepository
 import io.seda.inventory.exceptions.NotFoundException
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.event.EventListener
@@ -20,6 +18,7 @@ class ProductService {
     @Autowired lateinit var databaseClient: DatabaseClient // well FTS and stuff lol.
 
     @Autowired lateinit var embeddingService: EmbeddingService;
+    @Autowired lateinit var aiCategorizationService: AICategorizationService;
 
     data class SimpleProduct(val id: String, val name: String, val description: String?, val primaryImage: String?, val imageEmbedding: FloatArray?);
     fun Product.toSimpleProduct(): SimpleProduct {
@@ -106,6 +105,12 @@ class ProductService {
                     it
                 }
                 .map { productRepository.save(it) }.toList()
+        }
+
+        runBlocking {
+            aiCategorizationService.categorizeItAll(
+                productRepository.findAll()
+            ).map { productRepository.save(it) }.toList()
         }
     }
 

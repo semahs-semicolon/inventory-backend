@@ -52,7 +52,6 @@ class CategoryController {
     suspend fun getCategoryUnder(@PathVariable("id") id: String?): List<CategoryService.SimpleCategory> {
         return categoryService.getCategoryUnder(id);
     }
-
     data class CategorySearchRequest(val keyword: String);
     @GetMapping("/search")
     suspend fun search(@RequestBody request: CategorySearchRequest): List<CategoryService.SimpleCategory> {
