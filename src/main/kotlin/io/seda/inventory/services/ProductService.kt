@@ -86,8 +86,8 @@ class ProductService {
         return productRepository.existsById(productId);
     }
 
-    suspend fun getProductsByCategoryId(categoryId: String): List<SimpleProduct> {
-        return productRepository.findAllProductsByCategoryId(categoryId.toULong().toLong())
+    suspend fun getProductsByCategoryId(categoryId: String?): List<SimpleProduct> {
+        return productRepository.findAllProductsByCategoryId(categoryId?.toULong()?.toLong())
             .map {it.toSimpleProduct()}
             .toList()
     }

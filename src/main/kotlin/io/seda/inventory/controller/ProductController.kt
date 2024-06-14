@@ -27,6 +27,12 @@ class ProductController {
         return result;
     }
 
+    @GetMapping("/nocategory")
+    suspend fun search(): List<ProductService.SimpleProduct> {
+        val result = productService.getProductsByCategoryId(null);
+        return result;
+    }
+
     data class ImageSearchRequest(val embedding: FloatArray, val size: Int, val page: Int)
     @PostMapping("imageSearch")
     suspend fun imageSearch(@RequestBody imageSearchRequest: ImageSearchRequest): Flow<ProductService.SimpleProduct> {
