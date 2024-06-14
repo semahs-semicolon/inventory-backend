@@ -60,7 +60,7 @@ class AICategorizationService {
                             }
                         }
                     }
-                }.flattenMerge(10).collect {productRepository.save(it)}
+                }.flattenMerge(1).collect {productRepository.save(it)}
                 status.running = false;
             }
         }
