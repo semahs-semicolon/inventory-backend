@@ -147,39 +147,39 @@ class AICategorizationService {
     data class AIResult(val content: String);
     suspend fun askModel(category: Collection<String>, product: Product): String? {
 //        val suitability = Map
-//        val suitabliltyMap = category.asFlow().map {
-//            flow {
-//                val prompt = """
-//                    주어진 물품이 해당 카테고리에 적합한지 여부를 T/F로 출력하시오.
-//
-//                    ### 입력:
-//                    물품: ${product.name}
-//                    카테고리: ${it}
-//
-//                    ### 출력:
-//
-//                """.trimIndent()
-//                val result = webClientBuilder.build().post().uri(url+"/completion")
-//                    .bodyValue(mapOf(
-//                        "prompt" to prompt,
-//                        "n_predict" to 3,
-//                        "json_schema" to mapOf(
-//                            "enum" to listOf("T", "F")
-//                        ),
-//                        "cache_prompt" to true
-//                    ))
-//                    .retrieve()
-//                    .bodyToMono(AIResult::class.java)
-//                    .awaitSingle();
-//                println(it + " for "+product.name +" is "+result)
-//                emit(it to (result.content.trim() == "\"T\""))
-//            }
-//        }.flattenMerge(12).toList().toMap().toMutableMap()
-//        println(product.name + " / "+ suitabliltyMap)
-//
-//        suitabliltyMap["기타"] = true
-//        val nextCategories = suitabliltyMap.filterValues { it }.map { it.key }
-        val nextCategories = category;
+        val suitabliltyMap = category.asFlow().map {
+            flow {
+                val prompt = """
+                    주어진 물품이 해당 카테고리에 적합한지 여부를 T/F로 출력하시오.
+
+                    ### 입력:
+                    물품: ${product.name}
+                    카테고리: ${it}
+
+                    ### 출력:
+
+                """.trimIndent()
+                val result = webClientBuilder.build().post().uri(url+"/completion")
+                    .bodyValue(mapOf(
+                        "prompt" to prompt,
+                        "n_predict" to 3,
+                        "json_schema" to mapOf(
+                            "enum" to listOf("T", "F")
+                        ),
+                        "cache_prompt" to true
+                    ))
+                    .retrieve()
+                    .bodyToMono(AIResult::class.java)
+                    .awaitSingle();
+                println(it + " for "+product.name +" is "+result)
+                emit(it to (result.content.trim() == "\"T\""))
+            }
+        }.flattenMerge(12).toList().toMap().toMutableMap()
+        println(product.name + " / "+ suitabliltyMap)
+
+        suitabliltyMap["기타"] = true
+        val nextCategories = suitabliltyMap.filterValues { it }.map { it.key }
+//        val nextCategories = category;
 
         val prompt = """
             주어진 카테고리 목록에서 입력된 물품에 가장 잘 어울리는 카테고리를 골라 출력하십시오 
