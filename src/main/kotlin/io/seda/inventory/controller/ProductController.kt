@@ -1,5 +1,6 @@
 package io.seda.inventory.controller
 
+import io.seda.inventory.services.AICategorizationService
 import io.seda.inventory.services.ItemService
 import io.seda.inventory.services.ProductService
 import kotlinx.coroutines.flow.Flow
@@ -33,6 +34,13 @@ class ProductController {
         return result;
     }
 
+    @GetMapping("/noconfirm")
+    suspend fun noconfirm(@RequestParam("size") size: Int, @RequestParam("page") page: Int): List<ProductService.SimpleProduct> {
+        val result = productService.getProductsByNoConfirm(page, size);
+        return result;
+    }
+
+
     data class ImageSearchRequest(val embedding: FloatArray, val size: Int, val page: Int)
     @PostMapping("imageSearch")
     suspend fun imageSearch(@RequestBody imageSearchRequest: ImageSearchRequest): Flow<ProductService.SimpleProduct> {
@@ -42,11 +50,17 @@ class ProductController {
 
     data class ProductCreationRequest(val name: String?, val imageId: String?, val description: String?, val categoryId: String?);
 
+
+    @Autowired
+    lateinit var aiCategorizationService: AICategorizationService;
     @PostMapping("")
     suspend fun create(@RequestBody request: ProductCreationRequest): ProductService.SimpleProduct {
         requireNotNull(request.name) {"Name can not be null"}
         requireNotNull(request.description) {"Description can not be null"}
-        return productService.createProduct(request.name, request.description, request.imageId, request.categoryId);
+        val product = productService.createProduct(request.name, request.description, request.imageId, request.categoryId);
+
+        aiCategorizationService.categorize(product.id);
+        return product;
     }
 
     @DeleteMapping("/{id}")
@@ -57,6 +71,13 @@ class ProductController {
     @PatchMapping("/{id}")
     suspend fun update(@PathVariable("id") id: String, @RequestBody request: ProductCreationRequest): ProductService.SimpleProduct {
         return productService.updateProduct(id, request.name, request.description, request.imageId, request.categoryId);
+    }
+
+
+    data class CategoryRequest(val categoryId: String);
+    @PostMapping("/{id}/review")
+    suspend fun update(@PathVariable("id") id: String, @RequestBody categoryId: CategoryRequest): ProductService.SimpleProduct {
+        return productService.updateCategoryId(id, categoryId.categoryId);
     }
 
     @GetMapping("/{id}")

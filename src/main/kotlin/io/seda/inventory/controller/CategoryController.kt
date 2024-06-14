@@ -1,5 +1,6 @@
 package io.seda.inventory.controller
 
+import io.seda.inventory.services.AICategorizationService
 import io.seda.inventory.services.CategoryService
 import io.seda.inventory.services.ProductService
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 class CategoryController {
     @Autowired lateinit var categoryService: CategoryService;
     @Autowired lateinit var productService: ProductService;
+    @Autowired lateinit var aiCategorizationService: AICategorizationService;
 
     data class CreateCategoryRequest(val name: String, val description: String, val primaryImage: String?, val parentCategoryId: String?);
     @PostMapping("")
@@ -28,6 +30,22 @@ class CategoryController {
             request.parentCategoryId
         )
     }
+
+    @PostMapping("/ai")
+    suspend fun requestAICategorization() {
+        return aiCategorizationService.categorizeItAll();
+    }
+
+    @DeleteMapping("/ai")
+    suspend fun stopAICategorization() {
+        return aiCategorizationService.cancelItAll();
+    }
+    @GetMapping("/ai")
+    suspend fun getAICategorizationStatus(): AICategorizationService.Status {
+        return aiCategorizationService.getStatusInfo();
+    }
+
+
 
     @DeleteMapping("/{id}")
     suspend fun deleteCategory(@PathVariable("id") id: String) {
@@ -48,6 +66,11 @@ class CategoryController {
     suspend fun getCategoryUnder(): List<CategoryService.SimpleCategory> {
         return categoryService.getCategoryUnder(null);
     }
+    @GetMapping("/all")
+    suspend fun getAllCategory(): List<CategoryService.SimpleCategory> {
+        return categoryService.getAllCategory();
+    }
+
     @GetMapping("/{id}/categories")
     suspend fun getCategoryUnder(@PathVariable("id") id: String?): List<CategoryService.SimpleCategory> {
         return categoryService.getCategoryUnder(id);
@@ -67,6 +90,5 @@ class CategoryController {
     suspend fun getProducts(@PathVariable("id") id: String): List<ProductService.SimpleProduct> {
         return productService.getProductsByCategoryId(id);
     }
-
 
 }

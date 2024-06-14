@@ -20,9 +20,9 @@ class ProductService {
     @Autowired lateinit var embeddingService: EmbeddingService;
     @Autowired lateinit var aiCategorizationService: AICategorizationService;
 
-    data class SimpleProduct(val id: String, val name: String, val description: String?, val primaryImage: String?, val imageEmbedding: FloatArray?);
+    data class SimpleProduct(val id: String, val name: String, val description: String?, val primaryImage: String?, val imageEmbedding: FloatArray?, val categoryId: Long?, val categoryAccepted: Boolean?);
     fun Product.toSimpleProduct(): SimpleProduct {
-        return SimpleProduct(id?.toULong().toString(), name, description, primaryImage, imageEmbedding);
+        return SimpleProduct(id?.toULong().toString(), name, description, primaryImage, imageEmbedding, categoryId, categoryAccepted);
     }
 
     suspend fun getProducts(page: Int, count: Int, search: String): Flow<SimpleProduct> {
@@ -91,6 +91,13 @@ class ProductService {
             .map {it.toSimpleProduct()}
             .toList()
     }
+    suspend fun getProductsByNoConfirm(page: Int, count: Int): List<SimpleProduct> {
+        val pageRequest: PageRequest = PageRequest.of(page, count)
+        return productRepository.findAllCategoryNotAccepted(pageRequest.offset, pageRequest.pageSize)
+            .map {it.toSimpleProduct()}
+            .toList()
+    }
+
 
 
     @EventListener(ApplicationReadyEvent::class)
@@ -107,11 +114,20 @@ class ProductService {
                 .map { productRepository.save(it) }.toList()
         }
 
-        runBlocking {
-            aiCategorizationService.categorizeItAll(
-                productRepository.findAll()
-            ).map { productRepository.save(it) }.toList()
-        }
+//        runBlocking {
+//            aiCategorizationService.categorizeItAll(
+//                productRepository.findAll()
+//            ).map { productRepository.save(it) }.toList()
+//        }
+    }
+
+    suspend fun updateCategoryId(productId: String, categoryId: String?): ProductService.SimpleProduct {
+        val product = productRepository.findById(productId.toULong().toLong());
+        if (product == null) throw NotFoundException("Product with id $productId not found");
+        product.categoryAccepted = true;
+        product.categoryId = categoryId?.toULong()?.toLong();
+        productRepository.save(product);
+        return product.toSimpleProduct();
     }
 
 }

@@ -17,7 +17,8 @@ data class Product(
     var images: MutableList<String> = mutableListOf(),
     var categoryId: Long? = null,
     var tags: MutableList<String> = mutableListOf(),
-    var imageEmbedding: FloatArray? = null
+    var imageEmbedding: FloatArray? = null,
+    var categoryAccepted: Boolean = false
 )
 
 interface ProductRepository: CoroutineCrudRepository<Product, Long> {
@@ -28,6 +29,9 @@ interface ProductRepository: CoroutineCrudRepository<Product, Long> {
     fun findAllProductsByEmbedding(search: FloatArray, limit: Int): Flow<Product>
     @Query("SELECT * FROM products p LEFT JOIN items i ON p.id = i.product_id WHERE i.id is NULL OFFSET :offset LIMIT :limit")
     fun findAllOrphanProducts(offset: Long, limit: Int): Flow<Product>
+
+    @Query("SELECT * FROM products p WHERE p.category_accepted is FALSE OFFSET :offset LIMIT :limit")
+    fun findAllCategoryNotAccepted(offset: Long, limit: Int): Flow<Product>
 
     fun findAllProductsByCategoryId(categoryId: Long?): Flow<Product>
 }

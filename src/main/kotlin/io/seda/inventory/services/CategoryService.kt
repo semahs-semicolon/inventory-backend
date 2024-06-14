@@ -82,5 +82,11 @@ class CategoryService {
     }
 
 
+    suspend fun getAllCategory(): List<SimpleCategory> {
+        return categoryRepository.findAll().map { it.toSimpleCategory() }.toList();
+    }
+
+
+
 
 }

@@ -38,7 +38,7 @@ object ItemReadConverter : Converter<Row, Item?> {
     override fun convert(source: Row): Item {
 
         val product: ProductService.SimpleProduct? = if (source.metadata.contains("product_name")) {
-            ProductService.SimpleProduct((source.get("product_id") as Long).toULong().toString(), source.get("product_name") as String, null, source.get("product_primary_image") as String?, null)
+            ProductService.SimpleProduct((source.get("product_id") as Long).toULong().toString(), source.get("product_name") as String, null, source.get("product_primary_image") as String?, null, null, null)
         } else null;
         val location: LocationService.SimpleLocation? = if (source.metadata.contains("location_name")) {
             LocationService.SimpleLocation((source.get("location_id") as Long).toULong().toString(), source.get("location_name") as String)
