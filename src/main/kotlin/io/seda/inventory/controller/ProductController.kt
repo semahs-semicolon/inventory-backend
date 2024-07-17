@@ -3,10 +3,15 @@ package io.seda.inventory.controller
 import io.seda.inventory.services.AICategorizationService
 import io.seda.inventory.services.ItemService
 import io.seda.inventory.services.ProductService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.codec.multipart.Part
 import org.springframework.web.bind.annotation.*
+import kotlin.coroutines.CoroutineContext
 
 @RestController
 @RequestMapping("/products")
@@ -59,7 +64,11 @@ class ProductController {
         requireNotNull(request.description) {"Description can not be null"}
         val product = productService.createProduct(request.name, request.description, request.imageId, request.categoryId);
 
-        aiCategorizationService.categorize(product.id);
+        with(CoroutineScope(Dispatchers.IO)) {
+            launch {
+                aiCategorizationService.categorize(product.id);
+            }
+        }
         return product;
     }
 
