@@ -11,6 +11,7 @@ plugins {
 group = "io.seda"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_18
+java.targetCompatibility = JavaVersion.VERSION_18
 
 configurations {
 	compileOnly {
