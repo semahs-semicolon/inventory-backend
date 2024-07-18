@@ -24,13 +24,6 @@ repositories {
 }
 
 
-docker {
-	name = "${project.name}:${project.version}"
-	files(tasks.bootJar.get().outputs)
-	tag("dgRegistry", "registry.dungeons.guide/seda-inventory-backend:${project.version}")
-	setDockerfile( file("Dockerfile") )
-}
-
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -54,6 +47,8 @@ dependencies {
 	implementation("software.amazon.awssdk:s3")
 	implementation("software.amazon.awssdk:netty-nio-client")
 	implementation("org.dhatim:fastexcel:0.17.0")
+
+	implementation("com.amazonaws.serverless:aws-serverless-java-container-springboot3:2.0.1")
 }
 
 tasks.withType<KotlinCompile> {
