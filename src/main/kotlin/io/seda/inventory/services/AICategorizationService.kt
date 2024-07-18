@@ -32,6 +32,7 @@ class AICategorizationService {
     @Autowired
     lateinit var productRepository: ProductRepository;
 
+
     suspend fun categorizeItAll() {
         if (status.running) throw IllegalStateException("Can not run two categorization at same time")
         status.running = true;
@@ -247,6 +248,15 @@ class AICategorizationService {
                 break;
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+        }
+    }
+
+
+    suspend fun categorizeAsync(product: String) {
+        with(CoroutineScope(Dispatchers.IO)) {
+            launch {
+                categorize(product);
             }
         }
     }
