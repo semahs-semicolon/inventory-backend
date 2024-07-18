@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("org.springframework.boot") version "3.1.0-M2"
+	id("org.springframework.boot") version "3.3.1"
 	id("io.spring.dependency-management") version "1.1.0"
 	kotlin("jvm") version "1.8.10"
 	kotlin("plugin.spring") version "1.8.10"
@@ -24,19 +24,14 @@ repositories {
 }
 
 
-docker {
-	name = "${project.name}:${project.version}"
-	files(tasks.bootJar.get().outputs)
-	tag("dgRegistry", "registry.dungeons.guide/seda-inventory-backend:${project.version}")
-	setDockerfile( file("Dockerfile") )
-}
-
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
 	implementation("org.springframework.boot:spring-boot-starter-security")
-	implementation("org.springframework.boot:spring-boot-starter-webflux")
+	implementation("org.springframework.boot:spring-boot-starter-webflux") {
+//		exclude("org.springframework.boot", "spring-boot-starter-reactor-netty")
+	}
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -54,6 +49,10 @@ dependencies {
 	implementation("software.amazon.awssdk:s3")
 	implementation("software.amazon.awssdk:netty-nio-client")
 	implementation("org.dhatim:fastexcel:0.17.0")
+
+	implementation("com.amazonaws.serverless:aws-serverless-java-container-springboot3:2.0.3") {
+//		exclude("org.springframework", "spring-webmvc")
+	}
 }
 
 tasks.withType<KotlinCompile> {
@@ -65,4 +64,21 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+
+tasks.register<Zip>("buildZip" ) {
+	this.archiveFileName.value("inventory.zip")
+
+	this.from(tasks.compileJava)
+	this.from(tasks.processResources)
+	into("lib") {
+		from(configurations.compileClasspath) {
+			exclude("tomcat-embed-*")
+		}
+	}
+}
+
+tasks.build {
+	dependsOn("buildZip")
 }

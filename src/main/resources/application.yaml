@@ -24,3 +24,8 @@ image:
 
 embeddingurl: http://172.16.0.191:8080
 modelurl: http://172.16.2.136:8080
+#
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
