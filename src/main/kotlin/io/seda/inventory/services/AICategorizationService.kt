@@ -25,6 +25,7 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.lambda.LambdaAsyncClient
 import software.amazon.awssdk.services.lambda.model.InvocationType
 import software.amazon.awssdk.services.lambda.model.InvokeRequest
+import java.lang.UnsupportedOperationException
 
 
 @Service
@@ -44,6 +45,7 @@ class AICategorizationService {
 
 
     suspend fun categorizeItAll() {
+        if (true) throw UnsupportedOperationException("Not supported, too expensive.")
         if (status.running) throw IllegalStateException("Can not run two categorization at same time")
         status.running = true;
 
