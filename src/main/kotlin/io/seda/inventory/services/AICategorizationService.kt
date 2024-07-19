@@ -264,7 +264,7 @@ class AICategorizationService {
 
     data class AICategorizationRequest(val type: String = "single", val productId: String);
 
-    @Value("\${categorization_lambda_url}")
+    @Value("\${categorization_lambda_arn}")
     lateinit var embedding_endpoint: String
 
     @Autowired
