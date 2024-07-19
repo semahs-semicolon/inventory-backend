@@ -34,21 +34,31 @@ class WebfluxSecurityConfig {
     @Bean
     fun configureSecurity(http: ServerHttpSecurity, jwtAuthenticationFilter: AuthenticationWebFilter, jwtService: JWTService): SecurityWebFilterChain {
         return http
-            .csrf().disable()
-            .logout().disable()
-            .httpBasic().disable()
-            .formLogin().disable()
-            .authorizeExchange()
-            .pathMatchers("/signin").permitAll()
-            .pathMatchers("/users/signup").permitAll()
-            .pathMatchers("/users/**").authenticated()
-            .pathMatchers(HttpMethod.GET, "/images/**").permitAll()
-            .anyExchange().authenticated()
-            .and()
+            .csrf {
+                it.disable()
+            }
+            .logout {
+                it.disable()
+            }
+            .httpBasic {
+                it.disable()
+            }
+            .formLogin {
+                it.disable()
+            }
+            .authorizeExchange {
+                it.pathMatchers("/signin").permitAll()
+                  .pathMatchers("/users/signup").permitAll()
+                  .pathMatchers("/users/**").authenticated()
+                  .pathMatchers(HttpMethod.GET, "/images/**").permitAll()
+                  .anyExchange().authenticated()
+            }
             .addFilterAt(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
             .addFilterAt(JWTReactiveAuthorizationFilter(jwtService), SecurityWebFiltersOrder.AUTHORIZATION)
             .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-            .cors().configurationSource(corsWebFilter()).and()
+            .cors {
+                it.configurationSource(corsWebFilter())
+            }
             .build()
     }
 
