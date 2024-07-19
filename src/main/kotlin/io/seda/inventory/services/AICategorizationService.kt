@@ -1,7 +1,7 @@
 package io.seda.inventory.services
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.seda.inventory.configuration.WebClientAwsSigner
 import io.seda.inventory.data.Category
 import io.seda.inventory.data.CategoryRepository
 import io.seda.inventory.data.Product
@@ -10,11 +10,21 @@ import io.seda.inventory.exceptions.NotFoundException
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction
 import org.springframework.web.reactive.function.client.WebClient
-import java.lang.IllegalStateException
+import org.springframework.web.reactive.function.client.awaitBodilessEntity
+import reactor.kotlin.core.publisher.toMono
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider
+import software.amazon.awssdk.auth.signer.Aws4Signer
+import software.amazon.awssdk.core.SdkBytes
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.lambda.LambdaAsyncClient
+import software.amazon.awssdk.services.lambda.model.InvocationType
+import software.amazon.awssdk.services.lambda.model.InvokeRequest
 
 
 @Service
@@ -252,13 +262,43 @@ class AICategorizationService {
         }
     }
 
+    data class AICategorizationRequest(val type: String = "single", val productId: String);
 
+    @Value("\${categorization_lambda_url}")
+    lateinit var embedding_endpoint: String
+
+    @Autowired
+    lateinit var lambdaAsyncClient: LambdaAsyncClient;
+
+    @Autowired
+    lateinit var awsCredentialsProvider: AwsCredentialsProvider;
     suspend fun categorizeAsync(product: String) {
-        with(CoroutineScope(Dispatchers.IO)) {
-            launch {
-                categorize(product);
-            }
-        }
+        val body = objectMapper.writeValueAsString(AICategorizationRequest(productId = product, type = "single"));
+        lambdaAsyncClient.invoke(InvokeRequest.builder()
+            .functionName(embedding_endpoint)
+            .invocationType(InvocationType.EVENT)
+            .payload(SdkBytes.fromUtf8String(body)).build()).toMono().awaitSingleOrNull();
+//        with(CoroutineScope(Dispatchers.IO)) {
+//            launch {
+//
+//                val body = objectMapper.writeValueAsString(AICategorizationRequest(product));
+//
+//                val embedding =
+//                    webClientBuilder
+//                        .filter(
+//                            ExchangeFilterFunction.ofRequestProcessor(
+//                                WebClientAwsSigner(body, Aws4Signer.create(), awsCredentialsProvider, "es", Region.US_EAST_1),
+//                            )
+//                        ).build()
+//                        .post()
+//                        .uri(embedding_endpoint+"/categorize")
+//                        .bodyValue(AICategorizationRequest(product))
+//                        .retrieve().awaitBodilessEntity();
+////                return embedding.embedding;
+////                LambdaAsyncClient.create().invoke(InvokeRequest.builder().functionName())
+////                categorize(product);
+//            }
+//        }
     }
 
 }

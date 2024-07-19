@@ -48,6 +48,8 @@ dependencies {
 	testImplementation("org.springframework.security:spring-security-test")
 	implementation(platform("software.amazon.awssdk:bom:2.17.133"))
 	implementation("software.amazon.awssdk:s3")
+	implementation("software.amazon.awssdk:sagemakerruntime")
+	implementation("software.amazon.awssdk:lambda")
 	implementation("software.amazon.awssdk:netty-nio-client")
 	implementation("org.dhatim:fastexcel:0.17.0")
 
