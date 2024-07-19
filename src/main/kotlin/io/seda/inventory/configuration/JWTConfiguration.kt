@@ -18,10 +18,10 @@ import java.util.*
 
 @Configuration
 class JWTConfiguration {
-    @Value("\${jwt.private}")
+    @Value("\${JWT_PRIVKEY_PARAM_NAME}")
     lateinit var privateKeyName: String;
 
-    @Value("\${jwt.public}")
+    @Value("\${JWT_PUBKEY_PARAM_NAME}")
     lateinit var publicKeyName: String;
 
     @Value("\${jwt.random}")
