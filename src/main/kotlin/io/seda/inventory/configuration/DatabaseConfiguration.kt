@@ -17,19 +17,24 @@ import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration
 import org.springframework.data.r2dbc.convert.R2dbcCustomConversions
 import org.springframework.data.r2dbc.dialect.PostgresDialect
 import org.springframework.data.r2dbc.dialect.R2dbcDialect
+import software.amazon.awssdk.services.ssm.SsmClient
+import software.amazon.awssdk.services.ssm.model.GetParameterRequest
 
 
 @Configuration
 class DatabaseConfiguration: AbstractR2dbcConfiguration() {
     @Value("\${database.database}") lateinit var dbName: String;
     @Value("\${database.username}") lateinit var username: String;
-    @Value("\${database.password}") lateinit var password: String;
+    @Value("\${DATABASE_PASSWORD_PARAM_NAME}") lateinit var password: String;
     @Value("\${database.hostname}") lateinit var hostname: String;
     @Value("\${database.schema}") lateinit var schema: String;
     @Value("\${database.port}") lateinit var port: String;
 
     @Bean
-    override fun connectionFactory(): ConnectionFactory {// literal definition of no-brain api.
+    override fun connectionFactory(): ConnectionFactory {
+        var client: SsmClient = SsmClient.create();
+        val password = client.getParameter(GetParameterRequest.builder().withDecryption(true).name(password).build()).parameter().value();
+
         val config = PostgresqlConnectionConfiguration.builder()
             .host(hostname)
             .port(port.toInt())

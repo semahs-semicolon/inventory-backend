@@ -26,6 +26,7 @@ class JWTConfiguration {
 
     @Value("\${jwt.random}")
     lateinit var randomKey: String;
+
     @Bean
     fun keyPair(): KeyPair{
         var client: SsmClient = SsmClient.create();
