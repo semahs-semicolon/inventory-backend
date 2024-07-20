@@ -64,11 +64,7 @@ class ProductController {
         requireNotNull(request.description) {"Description can not be null"}
         val product = productService.createProduct(request.name, request.description, request.imageId, request.categoryId);
 
-        with(CoroutineScope(Dispatchers.IO)) {
-            launch {
-                aiCategorizationService.categorize(product.id);
-            }
-        }
+        aiCategorizationService.categorizeAsync(product.id)
         return product;
     }
 

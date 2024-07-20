@@ -1,30 +1,30 @@
 server.port: 8080
 
+# ip will be provided via env var
 database:
   database: inventory
   schema: inventory
   username: inventory_system
   password: asdasd
   port: 5432
-  hostname: 172.16.3.156
 
-jwt:
-  public:
-  private:
-  random: true
+# jwt will be provided via env var
+#jwt:
+#  public:
+#  private:
+#  random: true
 
-generatorId: 1
 
+# s3 credentials via env
+# s3 url is straightforward
 image:
-  access-key: 5294b88d9d5f4bb78e02b1dcfc182dc7
-  secret-key: 8eb082fd2aca458b812f133615187791
-  url: https://s4.cloud.seda.club/
   bucket: images
 
+# embedding? uh that's sagemaker. VIA sagemaker_model_arn
+#embeddingurl: http://172.16.0.191:8080
 
-embeddingurl: http://172.16.0.191:8080
-modelurl: http://172.16.2.136:8080
-#
+# model url will be provided via env var
+#modelurl: http://172.16.2.136:8080
 spring:
   main:
     allow-bean-definition-overriding: true

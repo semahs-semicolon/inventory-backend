@@ -2,9 +2,15 @@ on:
   push:
     branches:
       - production
+
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   setup_build_env:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -19,3 +25,14 @@ jobs:
         with:
           name: inventory.zip
           path: build/distributions/inventory.zip
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          role-session-name: samplerolesession
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: deploy to lambda
+        run: |
+          aws lambda update-function-code --function-name ${{ vars.FUNCTION_ARN }} --zip-file fileb://build/distributions/inventory.zip  --publish

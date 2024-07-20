@@ -12,7 +12,9 @@ import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import software.amazon.awssdk.core.ResponseBytes
 import software.amazon.awssdk.core.async.AsyncRequestBody
+import software.amazon.awssdk.core.async.AsyncResponseTransformer
 import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.model.*
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
@@ -54,6 +56,17 @@ class MinioService {
         )
         return Mono.fromFuture(completableFuture)
             .map { obj: HeadObjectResponse -> obj.contentLength() }
+    }
+
+    fun getObject(name: String?): Mono<ResponseBytes<GetObjectResponse>> {
+        val completableFuture = s3Client!!.getObject(
+            GetObjectRequest.builder()
+                .bucket(bucket)
+                .key(name).build(),
+            AsyncResponseTransformer.toBytes()
+        )
+
+        return Mono.fromFuture(completableFuture)
     }
 
     fun upload(file: FilePart, name: String?): Mono<UploadState> {
