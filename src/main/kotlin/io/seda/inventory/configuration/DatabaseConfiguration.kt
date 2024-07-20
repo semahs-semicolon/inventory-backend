@@ -17,6 +17,7 @@ import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration
 import org.springframework.data.r2dbc.convert.R2dbcCustomConversions
 import org.springframework.data.r2dbc.dialect.PostgresDialect
 import org.springframework.data.r2dbc.dialect.R2dbcDialect
+import software.amazon.awssdk.services.ssm.SsmAsyncClient
 import software.amazon.awssdk.services.ssm.SsmClient
 import software.amazon.awssdk.services.ssm.model.GetParameterRequest
 
@@ -32,8 +33,8 @@ class DatabaseConfiguration: AbstractR2dbcConfiguration() {
 
     @Bean
     override fun connectionFactory(): ConnectionFactory {
-        var client: SsmClient = SsmClient.create();
-        val password = client.getParameter(GetParameterRequest.builder().withDecryption(true).name(password).build()).parameter().value();
+        var client: SsmAsyncClient = SsmAsyncClient.create();
+        val password = client.getParameter(GetParameterRequest.builder().withDecryption(true).name(password).build()).get().parameter().value();
 
         val config = PostgresqlConnectionConfiguration.builder()
             .host(hostname)

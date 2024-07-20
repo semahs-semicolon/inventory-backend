@@ -4,6 +4,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import software.amazon.awssdk.services.ssm.SsmAsyncClient
 import software.amazon.awssdk.services.ssm.SsmClient
 import software.amazon.awssdk.services.ssm.model.GetParameterRequest
 import java.security.KeyFactory
@@ -29,14 +30,14 @@ class JWTConfiguration {
 
     @Bean
     fun keyPair(): KeyPair{
-        var client: SsmClient = SsmClient.create();
+        var client: SsmAsyncClient = SsmAsyncClient.create();
 
         if (randomKey.toBoolean()) {
             val keyPairGenerator = KeyPairGenerator.getInstance("RSA");
             return keyPairGenerator.generateKeyPair();
         } else {
-            val publicKey = client.getParameter(GetParameterRequest.builder().withDecryption(true).name(publicKeyName).build()).parameter().value();
-            val privateKey = client.getParameter(GetParameterRequest.builder().withDecryption(true).name(privateKeyName).build()).parameter().value();
+            val publicKey = client.getParameter(GetParameterRequest.builder().withDecryption(true).name(publicKeyName).build()).get().parameter().value();
+            val privateKey = client.getParameter(GetParameterRequest.builder().withDecryption(true).name(privateKeyName).build()).get().parameter().value();
 
             val privateKeySpec = PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKey));
             val publicKeySpec = X509EncodedKeySpec(Base64.getDecoder().decode(publicKey));
