@@ -74,6 +74,7 @@ tasks.register<Zip>("buildZip" ) {
 	this.archiveFileName.value("inventory.zip")
 
 	this.from(tasks.compileJava)
+	this.from(tasks.compileKotlin)
 	this.from(tasks.processResources)
 	into("lib") {
 		from(configurations.compileClasspath) {
