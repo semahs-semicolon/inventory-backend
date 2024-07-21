@@ -18,11 +18,11 @@ class InventoryLambdaHandler : RequestStreamHandler {
     }
 
     companion object {
-        private var handler: SpringBootLambdaContainerHandler<HttpApiV2ProxyRequest, AwsProxyResponse>? = null
+        private var handler: SpringBootLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse>? = null
 
         init {
             try {
-                handler = SpringBootLambdaContainerHandler.getHttpApiV2ProxyHandler(InventoryApplication::class.java)
+                handler = SpringBootLambdaContainerHandler.getAwsProxyHandler(InventoryApplication::class.java)
             } catch (e: ContainerInitializationException) {
                 // if we fail here. We re-throw the exception to force another cold start
                 e.printStackTrace()
