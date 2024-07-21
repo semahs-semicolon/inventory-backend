@@ -36,4 +36,5 @@ jobs:
 
       - name: deploy to lambda
         run: |
-          aws lambda update-function-code --function-name ${{ vars.FUNCTION_ARN }} --zip-file fileb://build/distributions/inventory.zip  --publish
+          VERSION_ID=`aws lambda update-function-code --function-name ${{ vars.FUNCTION_ARN }} --zip-file fileb://build/distributions/inventory.zip  --publish --query 'Version' --output text`
+          aws lambda update-alias --function-name ${{ vars.FUNCTION_ARN }} --function-version 3 --name production
