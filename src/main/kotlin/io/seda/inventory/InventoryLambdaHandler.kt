@@ -3,6 +3,7 @@ package io.seda.inventory
 import com.amazonaws.serverless.exceptions.ContainerInitializationException
 import com.amazonaws.serverless.proxy.model.AwsProxyRequest
 import com.amazonaws.serverless.proxy.model.AwsProxyResponse
+import com.amazonaws.serverless.proxy.model.HttpApiV2ProxyRequest
 import com.amazonaws.serverless.proxy.spring.SpringBootLambdaContainerHandler
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler
@@ -17,11 +18,11 @@ class InventoryLambdaHandler : RequestStreamHandler {
     }
 
     companion object {
-        private var handler: SpringBootLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse>? = null
+        private var handler: SpringBootLambdaContainerHandler<HttpApiV2ProxyRequest, AwsProxyResponse>? = null
 
         init {
             try {
-                handler = SpringBootLambdaContainerHandler.getAwsProxyHandler(InventoryApplication::class.java)
+                handler = SpringBootLambdaContainerHandler.getHttpApiV2ProxyHandler(InventoryApplication::class.java)
             } catch (e: ContainerInitializationException) {
                 // if we fail here. We re-throw the exception to force another cold start
                 e.printStackTrace()
