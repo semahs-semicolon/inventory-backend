@@ -50,7 +50,7 @@ class EmbeddingService {
                     )
                 ).build()
                 .post()
-            .uri(embedding_endpoint+"/process3")
+            .uri(embedding_endpoint+"/processs3")
             .bodyValue(EmbeddingRequest(imageid))
             .retrieve()
             .bodyToMono(Embedding::class.java)
