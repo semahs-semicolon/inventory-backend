@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider
 import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient
 import software.amazon.awssdk.regions.Region
@@ -19,7 +20,7 @@ import java.time.Duration
 class S3ClientConfiguration {
     @Bean
     fun awsCredentialsProvider(): AwsCredentialsProvider {
-        return EnvironmentVariableCredentialsProvider.create();
+        return DefaultCredentialsProvider.create();
     }
 
     @Bean
