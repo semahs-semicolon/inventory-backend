@@ -22,7 +22,7 @@ class ProductController {
     lateinit var itemService: ItemService;
 
     @GetMapping("")
-    suspend fun search(@RequestParam("search") search: String, @RequestParam("size") size: Int, @RequestParam("page") page: Int): Flow<ProductService.SimpleProduct> {
+    suspend fun search(@RequestParam("search") search: String, @RequestParam("size") size: Int, @RequestParam("page") page: Int): Flow<ProductService.SearchedProduct> {
         val result = productService.getProducts(page, size, search);
         return result;
     }

@@ -1,5 +1,6 @@
 package io.seda.inventory.services
 
+import io.seda.inventory.data.EnrichedProduct
 import io.seda.inventory.data.Product
 import io.seda.inventory.data.ProductRepository
 import io.seda.inventory.exceptions.NotFoundException
@@ -20,15 +21,29 @@ class ProductService {
     @Autowired lateinit var embeddingService: EmbeddingService;
     @Autowired lateinit var aiCategorizationService: AICategorizationService;
 
-    data class SimpleProduct(val id: String, val name: String, val description: String?, val primaryImage: String?, val imageEmbedding: FloatArray?, val categoryId: Long?, val categoryAccepted: Boolean?);
+    data class SimpleProduct(val id: String, val name: String, val description: String?, val primaryImage: String?, val categoryId: Long?, val categoryAccepted: Boolean?);
     fun Product.toSimpleProduct(): SimpleProduct {
-        return SimpleProduct(id?.toULong().toString(), name, description, primaryImage, imageEmbedding, categoryId, categoryAccepted);
+        return SimpleProduct(id?.toULong().toString(), name, description, primaryImage, categoryId, categoryAccepted);
     }
 
-    suspend fun getProducts(page: Int, count: Int, search: String): Flow<SimpleProduct> {
+
+    data class SearchedProduct(val id: String, val name: String, val description: String?, val primaryImage: String?, val imageEmbedding: FloatArray?, val categoryId: Long?, val categoryAccepted: Boolean?, val rank: Float?, val highlightName: String?, val highlightDesc: String?);
+    fun EnrichedProduct.toSearchedProduct(): SearchedProduct {
+        return SearchedProduct(id?.toULong().toString(), name, description, primaryImage, imageEmbedding, categoryId, categoryAccepted, rank ?: 0f, highlight_name ?: name, highlight_desc ?: description);
+    }
+    fun Product.toSearchedProduct(): SearchedProduct {
+        return SearchedProduct(id?.toULong().toString(), name, description, primaryImage, imageEmbedding, categoryId, categoryAccepted, null, null, null);
+    }
+
+
+    suspend fun getProducts(page: Int, count: Int, search: String): Flow<SearchedProduct> {
         val pageRequest: PageRequest = PageRequest.of(page, count)
-        return productRepository.findAllProducts("%$search%", pageRequest.offset, pageRequest.pageSize)
-            .map { it.toSimpleProduct() }
+        if (search.isBlank())
+            return productRepository.findAllProducts(pageRequest.offset, pageRequest.pageSize)
+                .map { it.toSearchedProduct() }
+        else
+            return productRepository.findAllProducts(search, pageRequest.offset, pageRequest.pageSize)
+                .map { it.toSearchedProduct() }
     }
     suspend fun getProducts(page: Int, count: Int, search: FloatArray): Flow<SimpleProduct> {
 //        val pageRequest: PageRequest = PageRequest.of(page, count)

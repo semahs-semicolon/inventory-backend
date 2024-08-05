@@ -78,7 +78,7 @@ tasks.register<Zip>("buildZip" ) {
 	this.from(tasks.processResources)
 	into("lib") {
 		from(configurations.compileClasspath) {
-			exclude("tomcat-embed-*")
+//			exclude("tomcat-embed-*")
 		}
 	}
 }

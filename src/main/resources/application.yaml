@@ -8,6 +8,10 @@ database:
   password: asdasd
   port: 5432
 
+#logging:
+#  level:
+#    org.springframework: debug
+
 # jwt will be provided via env var
 #jwt:
 #  public:

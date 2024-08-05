@@ -21,9 +21,28 @@ data class Product(
     var categoryAccepted: Boolean = false
 )
 
+data class EnrichedProduct(
+    @Id var id: Long? = null,
+    var name: String,
+    var description: String,
+    var primaryImage: String?,
+    var images: MutableList<String> = mutableListOf(),
+    var categoryId: Long? = null,
+    var tags: MutableList<String> = mutableListOf(),
+    var imageEmbedding: FloatArray? = null,
+    var categoryAccepted: Boolean = false,
+    @Transient var highlight_name: String? = null,
+    @Transient var highlight_desc: String? = null,
+    @Transient var rank: Float? = null
+)
+
 interface ProductRepository: CoroutineCrudRepository<Product, Long> {
-    @Query("SELECT * FROM products WHERE name LIKE :search OFFSET :offset LIMIT :limit")
-    fun findAllProducts(search: String, offset: Long, limit: Int): Flow<Product>
+    @Query("SELECT *, ts_rank_cd(textsearch, tsq) AS rank, ts_headline('public.korean', description, tsq, 'HighlightAll=true,StartSel=\$\$ST1\$\$,StopSel=\$\$ST2\$\$') as highlight_desc, ts_headline('public.korean', \"name\", tsq, 'HighlightAll=true,StartSel=\$\$ST1\$\$,StopSel=\$\$ST2\$\$') as highlight_name FROM products, websearch_to_tsquery('public.korean', :search) tsq WHERE tsq @@ textsearch ORDER BY rank DESC OFFSET :offset LIMIT :limit")
+    fun findAllProducts(search: String, offset: Long, limit: Int): Flow<EnrichedProduct>
+
+    @Query("SELECT * FROM products ORDER BY id DESC OFFSET :offset LIMIT :limit")
+    fun findAllProducts(offset: Long, limit: Int): Flow<Product>
+
 
     @Query("SELECT * FROM products ORDER BY image_embedding <=> :search LIMIT :limit")
     fun findAllProductsByEmbedding(search: FloatArray, limit: Int): Flow<Product>
