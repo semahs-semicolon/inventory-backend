@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import java.util.*
 import kotlin.coroutines.coroutineContext
 
 @Service
@@ -26,6 +27,7 @@ class UserService {
             username = username,
             password = passwordEncoder.encode(password),
             nickname = nickname,
+            authority = Arrays.asList("ROLE_STUDENT")
         );
         user = userRepository.save(user);
         return jwtService.generateJWTFor(user.id!!, user.authority);
