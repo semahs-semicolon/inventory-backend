@@ -21,6 +21,11 @@ class UserController {
 
     @PostMapping("/signup", consumes = [MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE])
     suspend fun signup(@RequestBody registrationRequest: RegistrationRequest): String {
+        if (registrationRequest.username.isEmpty()) throw IllegalArgumentException("Username can not be empty")
+        if (registrationRequest.password.length < 4) throw IllegalArgumentException("Password can not be less than 4 characters")
+        if (registrationRequest.nickname.isEmpty()) throw IllegalArgumentException("Nickname can not be empty")
+
+
         return userService.register(registrationRequest.username, registrationRequest.password, registrationRequest.nickname,);
     }
 
@@ -29,6 +34,7 @@ class UserController {
     @PutMapping("/nickname")
     @PreAuthorize("isAuthenticated()")
     suspend fun changeNickname(@RequestBody nicknameChangeRequest: NicknameChangeRequest): String {
+        if (nicknameChangeRequest.nickname.isEmpty()) throw IllegalArgumentException("Nickname can not be empty")
         return userService.changeName(nicknameChangeRequest.nickname);
     }
 
@@ -37,6 +43,7 @@ class UserController {
     @PutMapping("/password")
     @PreAuthorize("isAuthenticated()")
     suspend fun changePassword(@RequestBody passwordChangeRequest: PasswordChangeRequest) {
+        if (passwordChangeRequest.newPassword.length < 4) throw IllegalArgumentException("Password can not be less than 4 characters")
         userService.changePassword(passwordChangeRequest.oldPassword, passwordChangeRequest.newPassword);
     }
 }
