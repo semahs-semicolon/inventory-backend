@@ -36,6 +36,7 @@ out/
 ### VS Code ###
 .vscode/
 
+.env
 
 private.key
 private.pkcs8.key
