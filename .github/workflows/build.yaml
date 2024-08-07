@@ -47,7 +47,7 @@ jobs:
     needs: [deploy_to_staging]
     environment: production
     env:
-      PR_NUMBER: ${{ needs.check-pr.outputs.pr-number }}
+      VERSION_ID: ${{ needs.check-pr.outputs.version-id }}
     steps:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v3
