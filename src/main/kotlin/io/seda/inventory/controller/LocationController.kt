@@ -1,5 +1,6 @@
 package io.seda.inventory.controller
 
+import com.fasterxml.jackson.databind.JsonNode
 import io.seda.inventory.data.Location
 import io.seda.inventory.services.ItemService
 import io.seda.inventory.services.LocationService
@@ -37,17 +38,14 @@ class LocationController {
         return locationService.getLocation(id)
     }
 
-    data class LocationCreateRequest(val name: String, val x: Int, val y: Int, val width: Int, val height: Int, val parent: String?)
+    data class LocationCreateRequest(val name: String,  val parent: String?, val metadata: JsonNode)
 
     @PostMapping("")
     suspend fun createLocation(@RequestBody request: LocationCreateRequest): LocationService.SimpleLocationWithLocation {
         return locationService.createLocation(
             parentId = request.parent,
-            x = request.x,
-            y = request.y,
-            width = request.width,
-            height = request.height,
-            name = request.name
+            name = request.name,
+            metadata = request.metadata
         )
     }
 
@@ -68,19 +66,22 @@ class LocationController {
         return itemService.findItemsByLocation(id)
     }
 
-    data class BackgroundSetRequest(val imageId: String?);
-    @PutMapping("/{id}/background")
-    suspend fun saveBackground(@PathVariable("id") id: String, @RequestBody request: BackgroundSetRequest): LocationService.SimpleLocationWithLocation {
-        return locationService.setBackgroundId(id, request.imageId)
-    }
     @GetMapping("/{id}")
     suspend fun getItem(@PathVariable("id") id: String): LocationService.SimpleLocation {
         return locationService.getSimpleLocation(id)
     }
 
-    @PatchMapping("/layout")
-    suspend fun updateLayout(@RequestBody request: List<LocationService.LayoutUpdateRequest>): List<LocationService.TreeLocation> {
-        return locationService.updateLayout(request);
+
+    data class SetParentRequest(val parentId: String?);
+    @PutMapping("/{id}/parent")
+    suspend fun setParent(@PathVariable("id") id: String, @RequestBody request: SetParentRequest): LocationService.SimpleLocationWithLocation {
+        return locationService.updateParent(id, request.parentId);
     }
+    @PutMapping("/{id}/metadata")
+    suspend fun setMetadata(@PathVariable("id") id: String, @RequestBody request: JsonNode): LocationService.SimpleLocationWithLocation {
+        return locationService.updateMetadata(id, request);
+    }
+
+
 
 }
