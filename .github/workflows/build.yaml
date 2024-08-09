@@ -37,7 +37,7 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
       - name: upload to s3
         id: upload-to-s3
-        run: aws s3 sync /build/distributions/inventory.zip s3://${{ vars.STAGING_BUCKET_NAME }} --delete
+        run: aws s3 sync build/distributions/inventory.zip s3://${{ vars.STAGING_BUCKET_NAME }}/inventory.zip --delete
       - name: deploy to lambda
         id: deploy-to-lambda
         run: |
