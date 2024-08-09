@@ -18,7 +18,7 @@ class GuestLoginController {
 
     @PostMapping("", consumes = [MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE])
     suspend fun guestLogin(@RequestBody guestLoginRequest: GuestLoginRequest): String {
-        if(guestLoginRequest.token.isNotEmpty()) throw IllegalArgumentException("Token can not be empty")
+        if(guestLoginRequest.token.isEmpty()) throw IllegalArgumentException("Token can not be empty")
         return try {
             userService.guestLogin(guestLoginRequest.token)
         } catch (e: Exception) {
