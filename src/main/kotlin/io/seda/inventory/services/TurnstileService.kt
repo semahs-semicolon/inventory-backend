@@ -6,14 +6,14 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 import org.springframework.stereotype.Service
 
-@Serializable
-data class TurnstileBody(val secret: String, val response: String)
 @Serializable
 data class TurnstileResponse @OptIn(ExperimentalSerializationApi::class) constructor(val success: Boolean, @JsonNames("error-codes") val errorCodes: List<String>)
 
@@ -27,12 +27,12 @@ class TurnstileService {
                 json()
             }
         }
-        val res = client.submitForm(
-    			url = endpoint,
-    			formParameters = parameters {
-        		append("response", turnstileToken)
-        		append("secret", secretKey)
-					}
+        val res: HttpResponse = client.submitForm(
+            url = endpoint,
+            formParameters = parameters {
+                append("response", turnstileToken)
+                append("secret", secretKey)
+            }
         )
         if(res.status.value in 200..299) {
             val body: TurnstileResponse = res.body();
