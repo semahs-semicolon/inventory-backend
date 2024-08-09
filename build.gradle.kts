@@ -5,6 +5,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.0"
 	kotlin("jvm") version "1.8.10"
 	kotlin("plugin.spring") version "1.8.10"
+	kotlin("plugin.serialization").version("2.0.0")
 //	id("com.palantir.docker") version "0.22.1"
 }
 
@@ -46,13 +47,16 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.springframework.security:spring-security-test")
-	implementation(platform("software.amazon.awssdk:bom:2.17.133"))
+	implementation(platform("software.amazon.awssdk:bom:2.17.133"));
 	implementation("software.amazon.awssdk:s3")
 	implementation("software.amazon.awssdk:ssm")
 	implementation("software.amazon.awssdk:lambda")
 	implementation("software.amazon.awssdk:netty-nio-client")
 	implementation("org.dhatim:fastexcel:0.17.0")
-
+	implementation("io.ktor:ktor-client-core:2.3.12")
+	implementation("io.ktor:ktor-client-cio:2.3.12")
+	implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
+	implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
 	implementation("com.amazonaws.serverless:aws-serverless-java-container-springboot3:2.0.3") {
 //		exclude("org.springframework", "spring-webmvc")
 	}

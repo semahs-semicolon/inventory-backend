@@ -5,10 +5,12 @@ import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.impl.JWTParser
 import io.seda.inventory.auth.JWTUserDetails
+import jakarta.ws.rs.SeBootstrap.Instance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.Duration
 import java.time.Instant
+import java.util.*
 
 @Service
 class JWTService {
@@ -30,7 +32,14 @@ class JWTService {
             .withExpiresAt(Instant.now() + Duration.ofDays(7))
             .sign(jwtAlgorithm);
     }
-
+    fun generateJWTForGuest(uuid: Long, authority: List<String>): String {
+        return JWT.create()
+            .withSubject(uuid.toULong().toString())
+            .withIssuedAt(Instant.now())
+            .withClaim("authorities", authority)
+            .withExpiresAt(Instant.now() + Duration.ofHours(1))
+            .sign(jwtAlgorithm);
+    }
     fun validateJWT(jwt: String): JWTUserDetails {
         val decoded = decoder.verify(jwt);
         return JWTUserDetails(
