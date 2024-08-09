@@ -24,10 +24,10 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
       - name: Execute Gradle build
         run: gradle build
-      - uses: actions/upload-artifact@v4
-        with:
-          name: inventory.zip
-          path: build/distributions/inventory.zip
+      #- uses: actions/upload-artifact@v4
+       # with:
+        #  name: inventory.zip
+         # path: build/distributions/inventory.zip
 
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v3
@@ -37,7 +37,7 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
       - name: upload to s3
         id: upload-to-s3
-        run: aws s3 sync ./build/distributions/inventory.zip s3://${{ vars.STAGING_BUCKET_NAME }} --delete
+        run: aws s3 sync /build/distributions/inventory.zip s3://${{ vars.STAGING_BUCKET_NAME }} --delete
       - name: deploy to lambda
         id: deploy-to-lambda
         run: |
