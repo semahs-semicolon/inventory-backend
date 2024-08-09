@@ -1,12 +1,13 @@
 package io.seda.inventory.data
 
+import io.r2dbc.postgresql.codec.Json
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
-@Table("locations")
+@Table("locations2")
 data class Location(
-    @Id var id: Long? = null, var x: Int, var y: Int, var width: Int, var height: Int, var name: String, var parentId: Long?, var backgroundId: String?) // This will work for now
+    @Id var id: Long? = null, var name: String, var parentId: Long?, var metadata: Json) // This will work for now
 
 interface LocationRepository: CoroutineCrudRepository<Location, Long> {
     suspend fun existsByParentId(parentID: Long): Boolean;

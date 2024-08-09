@@ -94,7 +94,13 @@ class WebfluxSecurityConfig {
     @Bean
     fun corsWebFilter(): CorsConfigurationSource {
         val corsConfig = CorsConfiguration()
-        corsConfig.allowedOrigins = listOf("https://inventory.seda.club/", "https://internal.inventory.seda.club/", "http://localhost:5173/", "http://100.77.45.97:5173/", "https://inventory-test.seda.club/", "http://inventory-test.seda.club/")
+        corsConfig.allowedOrigins = listOf(
+            "https://inventory.seda.club/",
+            "https://internal.inventory.seda.club/",
+            "http://localhost:5173/",
+            "http://100.77.45.97:5173/",
+            "https://staging.inventory.seda.club/",
+            "http://staging.inventory.seda.club/")
         corsConfig.maxAge = 8000L
         corsConfig.allowedMethods = mutableListOf("POST", "GET", "DELETE", "PATCH", "PUT")
         corsConfig.addAllowedHeader("*")
