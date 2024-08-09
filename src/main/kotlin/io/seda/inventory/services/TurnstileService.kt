@@ -12,6 +12,7 @@ import io.ktor.http.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.json.Json
 import org.springframework.stereotype.Service
 
 @Serializable
@@ -25,8 +26,8 @@ class TurnstileService {
         val client = HttpClient(CIO) {
             install(ContentNegotiation) {
                json(Json {
-									ignoreUnknownKeys = true
-								})
+			ignoreUnknownKeys = true
+		})
             }
         }
         val res: HttpResponse = client.submitForm(
