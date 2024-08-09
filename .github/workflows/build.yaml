@@ -35,11 +35,13 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           role-session-name: samplerolesession
           aws-region: ${{ vars.AWS_REGION }}
-
+      - name: upload to s3
+        id: upload-to-s3
+        run: aws s3 sync ./build/distributions/inventory.zip s3://${{ vars.STAGING_BUCKET_NAME }} --delete
       - name: deploy to lambda
         id: deploy-to-lambda
         run: |
-          VERSION_ID=`aws lambda update-function-code --function-name ${{ vars.FUNCTION_ARN }} --zip-file fileb://build/distributions/inventory.zip  --publish --query 'Version' --output text`
+          VERSION_ID=`aws lambda update-function-code --function-name ${{ vars.FUNCTION_ARN }} --s3-bucket=${{ vars.STAGING_BUCKET_NAME }} --s3-key=$inventory.zip --publish --query 'Version' --output text`
           aws lambda update-alias --function-name ${{ vars.FUNCTION_ARN }} --function-version $VERSION_ID --name staging
           echo "VERSION_ID=$VERSION_ID" >> $GITHUB_OUTPUT
   deploy_to_production:
