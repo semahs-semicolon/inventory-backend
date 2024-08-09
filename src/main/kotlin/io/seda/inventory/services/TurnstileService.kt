@@ -7,6 +7,7 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 import org.springframework.stereotype.Service
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service
 @Serializable
 private data class TurnstileBody(val secret: String, val response: String)
 @Serializable
-data class TurnstileResponse(val success: Boolean, @JsonNames("error-codes") val errorCodes: List<String>)
+data class TurnstileResponse @OptIn(ExperimentalSerializationApi::class) constructor(val success: Boolean, @JsonNames("error-codes") val errorCodes: List<String>)
 
 @Service
 class TurnstileService {
