@@ -4,6 +4,7 @@ import io.seda.inventory.services.AICategorizationService
 import io.seda.inventory.services.CategoryService
 import io.seda.inventory.services.ProductService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -22,6 +23,7 @@ class CategoryController {
 
     data class CreateCategoryRequest(val name: String, val description: String, val primaryImage: String?, val parentCategoryId: String?);
     @PostMapping("")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun createCategory(@RequestBody request: CreateCategoryRequest): CategoryService.SimpleCategory {
         return categoryService.createCategory(
             request.name,
@@ -32,11 +34,13 @@ class CategoryController {
     }
 
     @PostMapping("/ai")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun requestAICategorization() {
         return aiCategorizationService.categorizeItAll();
     }
 
     @DeleteMapping("/ai")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun stopAICategorization() {
         return aiCategorizationService.cancelItAll();
     }
@@ -48,11 +52,13 @@ class CategoryController {
 
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun deleteCategory(@PathVariable("id") id: String) {
         return categoryService.deleteCategory(id)
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun updateCategory(@PathVariable("id") id: String, @RequestBody request: CategoryService.UpdatedMetadata): CategoryService.SimpleCategory {
         return categoryService.updateMeta(id, request)
     }

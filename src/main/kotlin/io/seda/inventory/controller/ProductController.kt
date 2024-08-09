@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.codec.multipart.Part
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import kotlin.coroutines.CoroutineContext
 
@@ -59,6 +60,7 @@ class ProductController {
     @Autowired
     lateinit var aiCategorizationService: AICategorizationService;
     @PostMapping("")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun create(@RequestBody request: ProductCreationRequest): ProductService.SimpleProduct {
         requireNotNull(request.name) {"Name can not be null"}
         requireNotNull(request.description) {"Description can not be null"}
@@ -69,11 +71,13 @@ class ProductController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun delete(@PathVariable("id") id: String) {
         return productService.deleteProduct(id)
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun update(@PathVariable("id") id: String, @RequestBody request: ProductCreationRequest): ProductService.SimpleProduct {
         return productService.updateProduct(id, request.name, request.description, request.imageId, request.categoryId);
     }
@@ -81,6 +85,7 @@ class ProductController {
 
     data class CategoryRequest(val categoryId: String);
     @PostMapping("/{id}/review")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun update(@PathVariable("id") id: String, @RequestBody categoryId: CategoryRequest): ProductService.SimpleProduct {
         return productService.updateCategoryId(id, categoryId.categoryId);
     }

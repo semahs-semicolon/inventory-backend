@@ -6,6 +6,7 @@ import org.springframework.core.io.Resource
 import org.springframework.http.MediaType
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.http.codec.multipart.Part
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -25,6 +26,7 @@ class ImageController {
 
 //    @PostMapping("", consumes = ["image/png", "image/jpeg", "image/gif", "image/jpg", "image/webp"])
     @PostMapping("")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun uploadImage(@RequestPart("image") filePart: Part): ImageService.StoredImage {
         return imageService.uploadImage(filePart as FilePart);
     }
