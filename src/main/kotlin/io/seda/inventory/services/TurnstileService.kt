@@ -13,7 +13,7 @@ import kotlinx.serialization.json.JsonNames
 import org.springframework.stereotype.Service
 
 @Serializable
-private data class TurnstileBody(val secret: String, val response: String)
+data class TurnstileBody(val secret: String, val response: String)
 @Serializable
 data class TurnstileResponse @OptIn(ExperimentalSerializationApi::class) constructor(val success: Boolean, @JsonNames("error-codes") val errorCodes: List<String>)
 
@@ -27,11 +27,14 @@ class TurnstileService {
                 json()
             }
         }
-        val res = client.post(endpoint) {
-            contentType(ContentType.Application.Json)
-            setBody(TurnstileBody(secretKey, turnstileToken))
-        }
-        if(res.status == HttpStatusCode.OK) {
+        val res = client.submitForm(
+    			url = endpoint,
+    			formParameters = parameters {
+        		append("response", turnstileToken)
+        		append("secret", secretKey)
+					}
+        )
+        if(res.status.value in 200..299) {
             val body: TurnstileResponse = res.body();
             if(body.success) {
                 return true;
