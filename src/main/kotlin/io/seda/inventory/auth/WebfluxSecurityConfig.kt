@@ -49,6 +49,7 @@ class WebfluxSecurityConfig {
             .authorizeExchange {
                 it.pathMatchers("/signin").permitAll()
                   .pathMatchers("/users/signup").permitAll()
+                  .pathMatchers("/guestLogin").permitAll()
                   .pathMatchers("/users/**").authenticated()
                   .pathMatchers(HttpMethod.GET, "/images/**").permitAll()
                   .anyExchange().authenticated()
