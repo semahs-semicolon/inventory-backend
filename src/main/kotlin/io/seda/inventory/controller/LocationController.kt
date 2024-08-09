@@ -41,6 +41,7 @@ class LocationController {
     data class LocationCreateRequest(val name: String,  val parent: String?, val metadata: JsonNode)
 
     @PostMapping("")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun createLocation(@RequestBody request: LocationCreateRequest): LocationService.SimpleLocationWithLocation {
         return locationService.createLocation(
             parentId = request.parent,
@@ -52,11 +53,13 @@ class LocationController {
     data class LocationNameChangeRequest(val name: String)
 
     @PutMapping("/{id}/name")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun changeLocationName(@PathVariable("id") id: String, @RequestBody request: LocationNameChangeRequest): LocationService.SimpleLocationWithLocation {
         return locationService.renameLocation(id, request.name);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun deleteLocation(@PathVariable("id") id: String) {
         return locationService.deleteLocation(id);
     }
@@ -74,10 +77,12 @@ class LocationController {
 
     data class SetParentRequest(val parentId: String?);
     @PutMapping("/{id}/parent")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun setParent(@PathVariable("id") id: String, @RequestBody request: SetParentRequest): LocationService.SimpleLocationWithLocation {
         return locationService.updateParent(id, request.parentId);
     }
     @PutMapping("/{id}/metadata")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun setMetadata(@PathVariable("id") id: String, @RequestBody request: JsonNode): LocationService.SimpleLocationWithLocation {
         return locationService.updateMetadata(id, request);
     }

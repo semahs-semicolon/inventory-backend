@@ -32,7 +32,7 @@ class UserController {
 
     data class NicknameChangeRequest(val nickname: String);
     @PutMapping("/nickname")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun changeNickname(@RequestBody nicknameChangeRequest: NicknameChangeRequest): String {
         if (nicknameChangeRequest.nickname.isEmpty()) throw IllegalArgumentException("Nickname can not be empty")
         return userService.changeName(nicknameChangeRequest.nickname);
@@ -41,7 +41,7 @@ class UserController {
     data class PasswordChangeRequest(val oldPassword: String, val newPassword: String);
 
     @PutMapping("/password")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     suspend fun changePassword(@RequestBody passwordChangeRequest: PasswordChangeRequest) {
         if (passwordChangeRequest.newPassword.length < 4) throw IllegalArgumentException("Password can not be less than 4 characters")
         userService.changePassword(passwordChangeRequest.oldPassword, passwordChangeRequest.newPassword);
