@@ -15,7 +15,7 @@ import kotlinx.serialization.json.JsonNames
 import org.springframework.stereotype.Service
 
 @Serializable
-data class TurnstileResponse @OptIn(ExperimentalSerializationApi::class) constructor(val success: Boolean, @JsonNames("error-codes") val errorCodes: List<String>)
+data class TurnstileResponse @OptIn(ExperimentalSerializationApi::class) constructor(val success: Boolean, @JsonNames("error-codes") val errorCodes: List<String>, @JsonNames("challenge_ts") val timestamp: String, val hostname: String, val action: String, val cdata: String)
 
 @Service
 class TurnstileService {

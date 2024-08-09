@@ -1,6 +1,5 @@
 package io.seda.inventory.controller
 
-import io.seda.inventory.auth.HttpExceptionFactory
 import io.seda.inventory.services.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
