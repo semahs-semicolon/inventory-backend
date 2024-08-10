@@ -12,10 +12,11 @@ import io.ktor.http.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.json.Json
 import org.springframework.stereotype.Service
 
 @Serializable
-data class TurnstileResponse @OptIn(ExperimentalSerializationApi::class) constructor(val success: Boolean, @JsonNames("error-codes") val errorCodes: List<String>, @JsonNames("challenge_ts") val timestamp: String, val hostname: String, val action: String, val cdata: String)
+data class TurnstileResponse @OptIn(ExperimentalSerializationApi::class) constructor(val success: Boolean, @JsonNames("error-codes") val errorCodes: List<String>)
 
 @Service
 class TurnstileService {
@@ -24,7 +25,9 @@ class TurnstileService {
     suspend fun verify(turnstileToken: String): Boolean {
         val client = HttpClient(CIO) {
             install(ContentNegotiation) {
-                json()
+               json(Json {
+			ignoreUnknownKeys = true
+		})
             }
         }
         val res: HttpResponse = client.submitForm(
