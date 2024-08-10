@@ -10,10 +10,10 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.web.client.HttpClientErrorException.BadRequest
 import reactor.core.publisher.Mono
 import java.util.*
 import kotlin.coroutines.coroutineContext
+import kotlin.random.Random
 
 @Service
 class UserService {
@@ -61,12 +61,9 @@ class UserService {
     }
 
     suspend fun guestLogin(token: String): String {
-        println(token)
         val isVerify = turnstileService.verify(token)
-        println(isVerify)
         if(isVerify) {
-            val uuid = UUID.randomUUID();
-            println(uuid)
+            val uuid = Random.Default.nextLong();
             return jwtService.generateJWTForGuest(uuid, listOf("ROLE_GUEST"));
         } else {
             throw Exception("turnstile verification failed")
