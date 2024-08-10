@@ -23,10 +23,12 @@ import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.reactive.CorsConfigurationSource
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 import io.seda.inventory.services.JWTService
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 
 
 @Configuration
 @EnableWebFluxSecurity
+@EnableMethodSecurity
 class WebfluxSecurityConfig {
     @Bean
     fun jacksonDecoder(): AbstractJackson2Decoder = Jackson2JsonDecoder()
