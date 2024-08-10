@@ -32,9 +32,9 @@ class JWTService {
             .withExpiresAt(Instant.now() + Duration.ofDays(7))
             .sign(jwtAlgorithm);
     }
-    fun generateJWTForGuest(uuid: Long, authority: List<String>): String {
+    fun generateJWTForGuest(uuid: UUID, authority: List<String>): String {
         return JWT.create()
-            .withSubject(uuid.toULong().toString())
+            .withSubject(uuid.toString())
             .withIssuedAt(Instant.now())
             .withClaim("authorities", authority)
             .withExpiresAt(Instant.now() + Duration.ofHours(1))

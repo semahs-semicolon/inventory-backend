@@ -1,7 +1,6 @@
 package io.seda.inventory.services
 
 import io.seda.inventory.auth.UserPrincipal
-import io.seda.inventory.data.GuestUser
 import io.seda.inventory.data.User
 import io.seda.inventory.data.UserRepository
 import kotlinx.coroutines.reactor.ReactorContext
@@ -62,11 +61,13 @@ class UserService {
     }
 
     suspend fun guestLogin(token: String): String {
-        if(turnstileService.verify(token)) {
-            val guestUser = GuestUser(
-                authority = listOf("ROLE_GUEST")
-            )
-            return jwtService.generateJWTForGuest(guestUser.id!!, guestUser.authority);
+        println(token)
+        val isVerify = turnstileService.verify(token)
+        println(isVerify)
+        if(isVerify) {
+            val uuid = UUID.randomUUID();
+            println(uuid)
+            return jwtService.generateJWTForGuest(uuid, listOf("ROLE_GUEST"));
         } else {
             throw Exception("turnstile verification failed")
         }
