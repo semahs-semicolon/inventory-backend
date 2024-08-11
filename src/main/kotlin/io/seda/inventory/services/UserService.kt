@@ -71,13 +71,6 @@ class UserService {
             throw Exception("turnstile verification failed")
         }
     }
-    @GetMapping("/authority")
-    suspend fun authority(): Mono<String> {
-        val authentication = SecurityContextHolder.getContext().authentication
-        val authorities = authentication.authorities
-        return Mono.just(
-            authorities.joinToString(", ") { it.authority }
-        )
-    }
+
 
 }
