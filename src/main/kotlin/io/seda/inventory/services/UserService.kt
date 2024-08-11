@@ -8,8 +8,10 @@ import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContext
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.web.bind.annotation.GetMapping
 import reactor.core.publisher.Mono
 import java.util.*
 import kotlin.coroutines.coroutineContext
@@ -69,4 +71,13 @@ class UserService {
             throw Exception("turnstile verification failed")
         }
     }
+    @GetMapping("/authority")
+    suspend fun authority(): Mono<String> {
+        val authentication = SecurityContextHolder.getContext().authentication
+        val authorities = authentication.authorities
+        return Mono.just(
+            authorities.joinToString(", ") { it.authority }
+        )
+    }
+
 }
