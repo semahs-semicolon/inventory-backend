@@ -39,7 +39,6 @@ class TurnstileService {
         )
         if(res.status.value in 200..299) {
             val body: TurnstileResponse = res.body();
-            println(body.toString())
             if(body.success) {
                 return true;
             } else {
