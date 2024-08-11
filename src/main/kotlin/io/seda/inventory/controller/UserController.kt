@@ -3,13 +3,10 @@ package io.seda.inventory.controller
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestPart
-import org.springframework.web.bind.annotation.RestController
 import io.seda.inventory.services.UserService
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.*
+import reactor.core.publisher.Mono
 
 @RestController
 @RequestMapping("/users")
@@ -45,5 +42,13 @@ class UserController {
     suspend fun changePassword(@RequestBody passwordChangeRequest: PasswordChangeRequest) {
         if (passwordChangeRequest.newPassword.length < 4) throw IllegalArgumentException("Password can not be less than 4 characters")
         userService.changePassword(passwordChangeRequest.oldPassword, passwordChangeRequest.newPassword);
+    }
+    @GetMapping("/authority")
+    suspend fun authority(): Mono<String> {
+        val authentication = SecurityContextHolder.getContext().authentication
+        val authorities = authentication.authorities
+        return Mono.just(
+            authorities.joinToString(", ") { it.authority }
+        )
     }
 }
