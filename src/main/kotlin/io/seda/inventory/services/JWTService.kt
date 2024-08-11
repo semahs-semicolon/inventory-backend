@@ -42,7 +42,6 @@ class JWTService {
     }
     fun validateJWT(jwt: String): JWTUserDetails {
         val decoded = decoder.verify(jwt);
-        println(decoded.getClaim("authorities").asList(String::class.java))
         return JWTUserDetails(
             decoded.getClaim("sub").asString().toULong().toLong(),
             decoded.getClaim("authorities").asList(String::class.java)
