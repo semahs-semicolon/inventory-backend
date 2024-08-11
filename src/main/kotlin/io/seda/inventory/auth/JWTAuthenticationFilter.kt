@@ -27,6 +27,8 @@ class JWTReactiveAuthorizationFilter(private val jwtService: JWTService) : WebFi
         try {
             val token: JWTUserDetails = jwtService.validateJWT(authHeader.substring(7))
             val auth = UsernamePasswordAuthenticationToken(token, authHeader.substring(7), listOf())
+            println(token.getAuthorities())
+            println(auth.authorities)
             return chain.filter(exchange).contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth))
         } catch (e: Exception) {
             logger.error("JWT exception", e)
