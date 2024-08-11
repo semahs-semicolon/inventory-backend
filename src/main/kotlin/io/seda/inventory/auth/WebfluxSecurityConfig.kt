@@ -60,7 +60,6 @@ class WebfluxSecurityConfig {
             }
             .addFilterAt(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
             .addFilterAt(JWTReactiveAuthorizationFilter(jwtService), SecurityWebFiltersOrder.AUTHORIZATION)
-            .addFilterAt(SecureContextFilterTest(), SecurityWebFiltersOrder.LAST)
             .cors {
                 it.configurationSource(corsWebFilter())
             }
