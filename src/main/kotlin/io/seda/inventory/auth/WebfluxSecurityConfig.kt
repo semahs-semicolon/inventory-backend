@@ -1,5 +1,6 @@
 package io.seda.inventory.auth
 
+import SecureContextFilterTest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -24,11 +25,12 @@ import org.springframework.web.cors.reactive.CorsConfigurationSource
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 import io.seda.inventory.services.JWTService
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
 
 
 @Configuration
 @EnableWebFluxSecurity
-@EnableMethodSecurity
+@EnableReactiveMethodSecurity
 class WebfluxSecurityConfig {
     @Bean
     fun jacksonDecoder(): AbstractJackson2Decoder = Jackson2JsonDecoder()
@@ -58,6 +60,7 @@ class WebfluxSecurityConfig {
             }
             .addFilterAt(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
             .addFilterAt(JWTReactiveAuthorizationFilter(jwtService), SecurityWebFiltersOrder.AUTHORIZATION)
+            .addFilterAt(SecureContextFilterTest(), SecurityWebFiltersOrder.LAST)
             .cors {
                 it.configurationSource(corsWebFilter())
             }
