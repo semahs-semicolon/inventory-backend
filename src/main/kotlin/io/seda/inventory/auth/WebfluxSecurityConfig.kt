@@ -80,7 +80,6 @@ class WebfluxSecurityConfig {
         authenticationWebFilter.setServerAuthenticationConverter(jwtConverter)
         authenticationWebFilter.setAuthenticationSuccessHandler(serverAuthenticationSuccessHandler)
         authenticationWebFilter.setAuthenticationFailureHandler(jwtServerAuthenticationFailureHandler)
-        authenticationWebFilter.setSecurityContextRepository(NoOpServerSecurityContextRepository.getInstance())
         return authenticationWebFilter
     }
 
