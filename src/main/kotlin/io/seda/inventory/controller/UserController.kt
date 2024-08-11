@@ -43,12 +43,4 @@ class UserController {
         if (passwordChangeRequest.newPassword.length < 4) throw IllegalArgumentException("Password can not be less than 4 characters")
         userService.changePassword(passwordChangeRequest.oldPassword, passwordChangeRequest.newPassword);
     }
-    @GetMapping("/authority")
-    suspend fun authority(): Mono<String> {
-        val authentication = SecurityContextHolder.getContext().authentication
-        val authorities = authentication.authorities
-        return Mono.just(
-            authorities.joinToString(", ") { it.authority }
-        )
-    }
 }
