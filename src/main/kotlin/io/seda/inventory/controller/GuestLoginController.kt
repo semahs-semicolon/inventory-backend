@@ -4,7 +4,6 @@ import io.seda.inventory.auth.HttpExceptionFactory
 import io.seda.inventory.services.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Mono
 
@@ -16,12 +15,15 @@ class GuestLoginController {
     data class GuestLoginRequest(val token: String)
 
     @PostMapping("", consumes = [MediaType.APPLICATION_JSON_VALUE])
-    suspend fun guestLogin(@RequestBody guestLoginRequest: GuestLoginRequest): String {
+    suspend fun guestLogin(@RequestBody guestLoginRequest: GuestLoginRequest): Mono<String> {
         return try {
-            if(guestLoginRequest.token.isEmpty()) throw IllegalArgumentException("Token can not be empty")
-            userService.guestLogin(guestLoginRequest.token)
+            if (guestLoginRequest.token.isEmpty()) {
+                Mono.error(IllegalArgumentException("Token can not be empty"))
+            } else {
+                userService.guestLogin(guestLoginRequest.token)
+            }
         } catch (e: Exception) {
-            throw HttpExceptionFactory.badRequest()
+            Mono.error(HttpExceptionFactory.badRequest())
         }
     }
 }

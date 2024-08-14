@@ -8,12 +8,9 @@ import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContext
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.GetMapping
 import reactor.core.publisher.Mono
-import java.util.*
 import kotlin.coroutines.coroutineContext
 import kotlin.random.Random
 
@@ -62,15 +59,15 @@ class UserService {
         userRepository.save(entityUser);
     }
 
-    suspend fun guestLogin(token: String): String {
-        val isVerify = turnstileService.verify(token)
-        if(isVerify) {
-            val uuid = Random.Default.nextLong();
-            return jwtService.generateJWTForGuest(uuid, listOf("ROLE_GUEST"));
-        } else {
-            throw Exception("turnstile verification failed")
-        }
+    suspend fun guestLogin(token: String): Mono<String> {
+        return turnstileService.verify(token)
+            .flatMap { success ->
+                if (success) {
+                    val uuid = Random.Default.nextLong()
+                    Mono.just(jwtService.generateJWTForGuest(uuid, listOf("ROLE_GUEST")))
+                } else {
+                    Mono.error(Exception("turnstile verification failed"))
+                }
+            }
     }
-
-
 }

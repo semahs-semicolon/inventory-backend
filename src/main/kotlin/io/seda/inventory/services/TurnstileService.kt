@@ -1,51 +1,51 @@
 package io.seda.inventory.services
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Value
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
-import kotlinx.serialization.json.Json
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.util.MultiValueMap
+import org.springframework.web.reactive.function.client.WebClient
+import reactor.core.publisher.Mono
 
-@Serializable
-data class TurnstileResponse @OptIn(ExperimentalSerializationApi::class) constructor(val success: Boolean, @JsonNames("error-codes") val errorCodes: List<String>)
 
 @Service
 class TurnstileService {
     @Value("\${TURNSTILE_SECRET}") lateinit var secretKey: String;
-    @Value("\${TURNSTILE_ENDPOINT}") lateinit var endpoint: String;
-    suspend fun verify(turnstileToken: String): Boolean {
-        val client = HttpClient(CIO) {
-            install(ContentNegotiation) {
-               json(Json {
-			ignoreUnknownKeys = true
-		})
+    suspend fun verify(turnstileToken: String): Mono<Boolean> {
+        val client = WebClient.create("https://challenges.cloudflare.com")
+        val formData: MultiValueMap<String, String> = LinkedMultiValueMap()
+        formData.add("secret", secretKey)
+        formData.add("response", turnstileToken)
+        val result: Mono<String> = client.post()
+            .uri("/turnstile/v0/siteverify")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .bodyValue(formData)
+            .exchange()
+            .flatMap { response ->
+                if (response.statusCode() == HttpStatus.OK) {
+                    response.bodyToMono(String::class.java)
+                } else {
+                    Mono.error(IllegalStateException("Unexpected status code during verifying turnstile: ${response.statusCode()}"))
+                }
             }
-        }
-        val res: HttpResponse = client.submitForm(
-            url = endpoint,
-            formParameters = parameters {
-                append("response", turnstileToken)
-                append("secret", secretKey)
+
+        return result
+            .map { response -> parseJsonSuccess(response) }
+            .flatMap { success ->
+                if (success) {
+                    Mono.just(true)
+                } else {
+                    Mono.error(Exception("Turnstile verification failed"))
+                }
             }
-        )
-        if(res.status.value in 200..299) {
-            val body: TurnstileResponse = res.body();
-            if(body.success) {
-                return true;
-            } else {
-                throw Exception("verify error: ${body.errorCodes}");
-            }
-        } else {
-            throw Exception("fetch error: ${res.status}")
-        }
     }
+    private fun parseJsonSuccess(json: String): Boolean {
+        val objectMapper = ObjectMapper()
+        val jsonNode: JsonNode = objectMapper.readTree(json)
+        return jsonNode.get("success").asBoolean()
+    }
+
 }
