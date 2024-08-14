@@ -23,6 +23,7 @@ class GuestLoginController {
                 userService.guestLogin(guestLoginRequest.token)
             }
         } catch (e: Exception) {
+            println(e)
             Mono.error(HttpExceptionFactory.badRequest())
         }
     }
