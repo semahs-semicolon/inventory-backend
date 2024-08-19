@@ -15,16 +15,16 @@ class GuestLoginController {
     data class GuestLoginRequest(val token: String)
 
     @PostMapping("", consumes = [MediaType.APPLICATION_JSON_VALUE])
-    suspend fun guestLogin(@RequestBody guestLoginRequest: GuestLoginRequest): Mono<String> {
+    suspend fun guestLogin(@RequestBody guestLoginRequest: GuestLoginRequest): String {
         return try {
             if (guestLoginRequest.token.isEmpty()) {
-                Mono.error(IllegalArgumentException("Token can not be empty"))
+                throw IllegalArgumentException("Token can not be empty")
             } else {
                 userService.guestLogin(guestLoginRequest.token)
             }
         } catch (e: Exception) {
             println(e)
-            Mono.error(HttpExceptionFactory.badRequest())
+            throw HttpExceptionFactory.badRequest()
         }
     }
 }
