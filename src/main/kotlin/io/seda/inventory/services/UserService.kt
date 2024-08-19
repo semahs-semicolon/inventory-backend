@@ -63,16 +63,14 @@ class UserService {
         userRepository.save(entityUser);
     }
 
-    suspend fun guestLogin(token: String): Mono<String> {
-        return turnstileService.verify(token)
-            .flatMap { success ->
-                if (success) {
-                    val uuid = Random.Default.nextLong()
-                    Mono.just(jwtService.generateJWTForGuest(uuid, listOf("ROLE_GUEST")))
-                } else {
-                    Mono.error(Exception("turnstile verification failed"))
-                }
-            }
+    suspend fun guestLogin(token: String): String {
+        if(turnstileService.verify(token)) {
+            val uuid = Random.Default.nextLong()
+            return jwtService.generateJWTForGuest(uuid, listOf("ROLE_GUEST"))
+        } else {
+            throw Exception("turnstile verification failed")
+        }
+
     }
 
     suspend fun createVerifyCode(identifier: String, authority: List<String>): VerifyCode {
