@@ -53,6 +53,10 @@ dependencies {
 	implementation("software.amazon.awssdk:lambda")
 	implementation("software.amazon.awssdk:netty-nio-client")
 	implementation("org.dhatim:fastexcel:0.17.0")
+	implementation("io.ktor:ktor-client-core:2.3.12")
+	implementation("io.ktor:ktor-client-cio:2.3.12")
+	implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
+	implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
 	implementation("com.amazonaws.serverless:aws-serverless-java-container-springboot3:2.0.3") {
 //		exclude("org.springframework", "spring-webmvc")
 	}
