@@ -14,16 +14,16 @@ class UserController {
     @Autowired
     lateinit var userService: UserService;
 
-    data class RegistrationRequest(val username: String, val password: String, val nickname: String);
+    data class RegistrationRequest(val username: String, val password: String, val nickname: String, val verifyCode: String);
 
     @PostMapping("/signup", consumes = [MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE])
     suspend fun signup(@RequestBody registrationRequest: RegistrationRequest): String {
         if (registrationRequest.username.isEmpty()) throw IllegalArgumentException("Username can not be empty")
         if (registrationRequest.password.length < 4) throw IllegalArgumentException("Password can not be less than 4 characters")
         if (registrationRequest.nickname.isEmpty()) throw IllegalArgumentException("Nickname can not be empty")
+        if (registrationRequest.verifyCode.isEmpty()) throw IllegalArgumentException("Verify code can not be empty")
 
-
-        return userService.register(registrationRequest.username, registrationRequest.password, registrationRequest.nickname,);
+        return userService.register(registrationRequest.username, registrationRequest.password, registrationRequest.nickname, registrationRequest.verifyCode);
     }
 
 

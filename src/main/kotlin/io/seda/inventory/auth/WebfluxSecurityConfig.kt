@@ -54,6 +54,7 @@ class WebfluxSecurityConfig {
                   .pathMatchers("/users/signup").permitAll()
                   .pathMatchers("/guestLogin").permitAll()
                   .pathMatchers("/users/**").authenticated()
+                  .pathMatchers("/verifyCode/**").hasRole("ROLE_ADMIN")
                   .pathMatchers(HttpMethod.GET, "/images/**").permitAll()
                   .anyExchange().authenticated()
             }
