@@ -11,9 +11,11 @@ data class User(
     val username: String,
     var password: String,
     var nickname: String,
-    var authority: List<String> = listOf()
+    var authority: List<String> = listOf(),
+    var identifier: String,
 )
 
 interface UserRepository: CoroutineCrudRepository<User, Long> {
     suspend fun findByUsername(username: String): User?;
+    suspend fun findByIdentifier(identifier: String): User?;
 }

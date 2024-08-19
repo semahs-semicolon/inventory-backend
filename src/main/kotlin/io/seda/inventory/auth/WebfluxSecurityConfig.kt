@@ -1,6 +1,5 @@
 package io.seda.inventory.auth
 
-import SecureContextFilterTest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -55,6 +54,7 @@ class WebfluxSecurityConfig {
                   .pathMatchers("/users/signup").permitAll()
                   .pathMatchers("/guestLogin").permitAll()
                   .pathMatchers("/users/**").authenticated()
+                  .pathMatchers("/verifyCode/**").hasRole("ROLE_ADMIN")
                   .pathMatchers(HttpMethod.GET, "/images/**").permitAll()
                   .anyExchange().authenticated()
             }
