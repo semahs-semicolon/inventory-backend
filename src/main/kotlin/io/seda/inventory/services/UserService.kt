@@ -76,7 +76,7 @@ class UserService {
 
     suspend fun createVerifyCode(identifier: String, authority: List<String>): VerifyCode {
         val code = Random.Default.nextBytes(4).joinToString("") { "%02x".format(it) }
-        val verifyCode = VerifyCode(code, identifier, authority)
+        val verifyCode = VerifyCode(code = code, identifier = identifier, authority = authority)
         verifyCodeRepository.save(verifyCode);
         return verifyCode;
     }
@@ -86,7 +86,7 @@ class UserService {
         return verifyCode;
     }
     suspend fun createIdentifier(metadata: String): Identifier {
-        val identifier = Identifier(Random.Default.nextBytes(8).joinToString("") { "%02x".format(it) }, metadata);
+        val identifier = Identifier(identifier = Random.Default.nextBytes(8).joinToString("") { "%02x".format(it) }, metadata = metadata);
         identifierRepository.save(identifier);
         return identifier;
     }

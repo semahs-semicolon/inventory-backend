@@ -7,6 +7,7 @@ import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 @Table(name = "verify_codes")
 data class VerifyCode(
     @Id
+    var id: Long? = null,
     var code: String,
     var identifier: String,
     var authority: List<String> = listOf()
