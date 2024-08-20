@@ -76,8 +76,8 @@ class UserService {
 
     suspend fun createVerifyCode(identifier: String, authority: List<String>): VerifyCode {
         val code = Random.Default.nextBytes(4).joinToString("") { "%02x".format(it) }
-        val verifyCode = VerifyCode(code = code, identifier = identifier, authority = authority)
-        verifyCodeRepository.save(verifyCode);
+        var verifyCode = VerifyCode(code = code, identifier = identifier, authority = authority)
+        verifyCode = verifyCodeRepository.save(verifyCode);
         return verifyCode;
     }
     suspend fun invokeVerifyCode(code: String): VerifyCode {
@@ -86,25 +86,26 @@ class UserService {
         return verifyCode;
     }
     suspend fun createIdentifier(metadata: String): Identifier {
-        val identifier = Identifier(identifier = Random.Default.nextBytes(8).joinToString("") { "%02x".format(it) }, metadata = metadata);
-        identifierRepository.save(identifier);
+        val code = Random.Default.nextBytes(4).joinToString("") { "%02x".format(it) }
+        var identifier = Identifier(code = code, metadata = metadata);
+        identifier = identifierRepository.save(identifier);
         return identifier;
     }
     suspend fun invokeIdentifier(identifier: String): Identifier {
-        val id = identifierRepository.findByIdentifier(identifier) ?: throw IllegalArgumentException("Invalid identifier");
+        val id = identifierRepository.findByCode(identifier) ?: throw IllegalArgumentException("Invalid identifier");
         identifierRepository.delete(id);
         return id;
     }
     suspend fun getUserMetadata(identifier: String): String {
         val id = userRepository.findByIdentifier(identifier) ?: throw IllegalArgumentException("Invalid identifier");
-        val metadata = identifierRepository.findByIdentifier(id.identifier) ?: throw IllegalArgumentException("Invalid identifier");
+        val metadata = identifierRepository.findByCode(id.identifier) ?: throw IllegalArgumentException("Invalid identifier");
         return metadata.metadata;
     }
     suspend fun findVerifyCode(code: String): VerifyCode {
         return verifyCodeRepository.findByCode(code) ?: throw IllegalArgumentException("Invalid verify code");
     }
     suspend fun findIdentifier(identifier: String): Identifier {
-        return identifierRepository.findByIdentifier(identifier) ?: throw IllegalArgumentException("Invalid identifier");
+        return identifierRepository.findByCode(identifier) ?: throw IllegalArgumentException("Invalid identifier");
     }
     suspend fun findAllVerifyCodes(): List<VerifyCode> {
         return verifyCodeRepository.findAll().toList();
