@@ -3,7 +3,6 @@ package io.seda.inventory.data
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
-import org.springframework.lang.Nullable
 
 @Table(name = "users")
 data class User(
@@ -13,8 +12,7 @@ data class User(
     var password: String,
     var nickname: String,
     var authority: List<String> = listOf(),
-    @Nullable
-    var identifier: String,
+    var identifier: String?,
 )
 
 interface UserRepository: CoroutineCrudRepository<User, Long> {
