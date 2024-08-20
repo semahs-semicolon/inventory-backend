@@ -86,26 +86,26 @@ class UserService {
         return verifyCode;
     }
     suspend fun createIdentifier(metadata: String): Identifier {
-        val code = Random.Default.nextBytes(4).joinToString("") { "%02x".format(it) }
-        var identifier = Identifier(code = code, metadata = metadata);
+        val code = Random.Default.nextBytes(8).joinToString("") { "%02x".format(it) }
+        var identifier = Identifier(identifierCode = code, metadata = metadata);
         identifier = identifierRepository.save(identifier);
         return identifier;
     }
     suspend fun invokeIdentifier(identifier: String): Identifier {
-        val id = identifierRepository.findByCode(identifier) ?: throw IllegalArgumentException("Invalid identifier");
+        val id = identifierRepository.findByIdentifierCode(identifier) ?: throw IllegalArgumentException("Invalid identifier");
         identifierRepository.delete(id);
         return id;
     }
     suspend fun getUserMetadata(identifier: String): String {
         val id = userRepository.findByIdentifier(identifier) ?: throw IllegalArgumentException("Invalid identifier");
-        val metadata = identifierRepository.findByCode(id.identifier) ?: throw IllegalArgumentException("Invalid identifier");
+        val metadata = identifierRepository.findByIdentifierCode(id.identifier) ?: throw IllegalArgumentException("Invalid identifier");
         return metadata.metadata;
     }
     suspend fun findVerifyCode(code: String): VerifyCode {
         return verifyCodeRepository.findByCode(code) ?: throw IllegalArgumentException("Invalid verify code");
     }
     suspend fun findIdentifier(identifier: String): Identifier {
-        return identifierRepository.findByCode(identifier) ?: throw IllegalArgumentException("Invalid identifier");
+        return identifierRepository.findByIdentifierCode(identifier) ?: throw IllegalArgumentException("Invalid identifier");
     }
     suspend fun findAllVerifyCodes(): List<VerifyCode> {
         return verifyCodeRepository.findAll().toList();
