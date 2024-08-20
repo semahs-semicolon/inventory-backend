@@ -9,12 +9,12 @@ import org.springframework.lang.Nullable
 data class Identifier(
     @Id
     var id: Long? = null,
-    var identifier: String,
+    var code: String,
     @Nullable
     var metadata: String = ""
 )
 
 interface IdentifierRepository: CoroutineCrudRepository<Identifier, String> {
-    suspend fun findByIdentifier(identifier: String): Identifier?;
+    suspend fun findByCode(code: String): Identifier?;
     suspend fun findByMetadata(metadata: String): Identifier?;
 }
