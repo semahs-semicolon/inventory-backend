@@ -36,6 +36,7 @@ class UserService {
             identifier = code.identifier
         );
         user = userRepository.save(user);
+        verifyCodeRepository.delete(code);
         return jwtService.generateJWTFor(user.id!!, user.authority);
     }
     @PreAuthorize("isAuthenticated()")
