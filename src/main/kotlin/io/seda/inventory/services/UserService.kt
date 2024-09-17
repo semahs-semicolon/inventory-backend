@@ -98,8 +98,8 @@ class UserService {
     }
     suspend fun getUserMetadata(identifier: String): String {
         val id = userRepository.findByIdentifier(identifier) ?: throw IllegalArgumentException("Invalid identifier");
-        val metadata = identifierRepository.findByIdentifierCode(id.identifier) ?: throw IllegalArgumentException("Invalid identifier");
-        return metadata.metadata;
+        val metadata = id.identifier?.let { identifierRepository.findByIdentifierCode(it) } ?: throw IllegalArgumentException("Invalid identifier");
+        return metadata.metadata.toString();
     }
     suspend fun findVerifyCode(code: String): VerifyCode {
         return verifyCodeRepository.findByCode(code) ?: throw IllegalArgumentException("Invalid verify code");
