@@ -1,6 +1,7 @@
 package io.seda.inventory.controller
 
 import io.r2dbc.postgresql.codec.Json
+import io.seda.inventory.data.ReservedDate
 import io.seda.inventory.services.ReservedService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -80,7 +81,7 @@ class ReservedController {
     suspend fun getReservedDateList() = reservedService.getAllDate()
 
     @GetMapping("/date/date/{dateTimestamp}")
-    suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: Long): Any? {
+    suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: Long): ReservedDate? {
         return reservedService.getDateByDate(dateTimestamp)
     }
 
