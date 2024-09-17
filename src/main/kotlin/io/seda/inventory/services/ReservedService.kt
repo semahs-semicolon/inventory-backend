@@ -13,7 +13,7 @@ class ReservedService {
     @Autowired lateinit var reservedRoomRepository: ReservedRoomRepository
     @Autowired lateinit var reservedTimesetRepository: ReservedTimesetRepository
     @Autowired lateinit var reservedDateRepository: ReservedDateRepository
-    @Autowired lateinit var reservedScheduleRepository: ScheduleRepository
+    @Autowired lateinit var reservedScheduleRepository: ReservedScheduleRepository
 
     suspend fun createSchedule(reqStudent: String, studentSum: Int, reqRoom: Long, timeset: List<Long>) {
         val schedule = ReservedSchedule(
