@@ -13,7 +13,7 @@ data class VerifyCode(
     var authority: List<String> = listOf()
 )
 
-interface VerifyCodeRepository: CoroutineCrudRepository<VerifyCode, String> {
+interface VerifyCodeRepository: CoroutineCrudRepository<VerifyCode, Long> {
     suspend fun findByCode(code: String): VerifyCode?;
     suspend fun findByIdentifier(identifier: String): VerifyCode?;
 }

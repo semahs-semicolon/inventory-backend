@@ -20,7 +20,7 @@ data class ReservedSchedule(
     var timeset: List<Long>,
 )
 
-interface ScheduleRepository: CoroutineCrudRepository<ReservedSchedule, Long> {
+interface ReservedScheduleRepository: CoroutineCrudRepository<ReservedSchedule, Long> {
     fun findByReqRoom(reqRoom: Long): ReservedSchedule?
     fun findAllByApproved(approved: Boolean): Flow<ReservedSchedule>
     fun findAllByReviewer(reviewer: String): ReservedSchedule?

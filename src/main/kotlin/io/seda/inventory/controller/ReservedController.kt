@@ -79,7 +79,7 @@ class ReservedController {
     @GetMapping("/date")
     suspend fun getReservedDateList() = reservedService.getAllDate()
 
-    @GetMapping("/date/{dateTimestamp}")
+    @GetMapping("/date/date/{dateTimestamp}")
     suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: Long): Any? {
         return reservedService.getDateByDate(dateTimestamp)
     }
