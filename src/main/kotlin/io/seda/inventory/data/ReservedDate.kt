@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
+import reactor.core.publisher.Mono
 import java.time.LocalDate
 
 @Table(name = "reserved_date")
@@ -17,7 +18,7 @@ data class ReservedDate(
 )
 
 interface ReservedDateRepository: CoroutineCrudRepository<ReservedDate, Long> {
-    fun findByDate(date: LocalDate): ReservedDate?
+    fun findFirstByDate(date: LocalDate): Mono<ReservedDate>
     @Query("SELECT * FROM reserved_date WHERE date BETWEEN :start AND :end")
     fun findAllByDateBetween(start: LocalDate, end: LocalDate): Flow<ReservedDate>
 }
