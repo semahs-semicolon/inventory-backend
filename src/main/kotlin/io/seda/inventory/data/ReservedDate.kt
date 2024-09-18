@@ -9,13 +9,27 @@ import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import reactor.core.publisher.Mono
 import java.time.LocalDate
 
+data class ReservedDateSerializable (
+    var id: Long? = null,
+    var date: LocalDate,
+    var available: String
+)
+
 @Table(name = "reserved_date")
 data class ReservedDate(
     @Id
     var id: Long? = null,
     var date: LocalDate,
     var available: Json
-)
+) {
+    fun toSerializable(): ReservedDateSerializable {
+        return ReservedDateSerializable(
+            id = id,
+            date = date,
+            available = available.asString()
+        )
+    }
+}
 
 interface ReservedDateRepository: CoroutineCrudRepository<ReservedDate, Long> {
     fun findFirstByDate(date: LocalDate): Mono<ReservedDate>

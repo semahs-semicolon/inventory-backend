@@ -2,6 +2,7 @@ package io.seda.inventory.controller
 
 import io.r2dbc.postgresql.codec.Json
 import io.seda.inventory.data.ReservedDate
+import io.seda.inventory.data.ReservedDateSerializable
 import io.seda.inventory.data.ReservedSchedule
 import io.seda.inventory.services.ReservedService
 import org.springframework.beans.factory.annotation.Autowired
@@ -96,8 +97,9 @@ class ReservedController {
 
     //dateTimestamp: yyyy-MM-dd
     @GetMapping("/date/date/{dateTimestamp}")
-    suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: String): Mono<ReservedDate> {
+    suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: String): Mono<ReservedDateSerializable> {
         return reservedService.getDateByDate(LocalDate.parse(dateTimestamp))
+            .map { it.toSerializable() }
     }
     @GetMapping("/date/between/{start}/{end}")
     suspend fun getReservedDateBetween(@PathVariable("start") start: String, @PathVariable("end") end: String) = reservedService.getDateBetween(LocalDate.parse(start), LocalDate.parse(end))
