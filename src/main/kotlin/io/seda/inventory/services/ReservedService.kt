@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.toList
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -91,25 +92,25 @@ class ReservedService {
         timeset.endMinute = endMinute ?: timeset.endMinute
         reservedTimesetRepository.save(timeset)
     }
-    suspend fun createDate(date: Long, available: List<Json>) {
+    suspend fun createDate(date: LocalDate, available: Json?) {
         val reservedDate = ReservedDate(
-            date = Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
-            available = available
+            date = date,
+            available = available ?: Json.of("[]")
         )
         reservedDateRepository.save(reservedDate)
     }
     suspend fun deleteDate(id: Long) {
         reservedDateRepository.deleteById(id)
     }
-    suspend fun updateDate(id: Long, date: Long) {
+    suspend fun updateDate(id: Long, date: LocalDate) {
         val reservedDate = reservedDateRepository.findById(id) ?: return
-        if(reservedDateRepository.findByDate(Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))) != null) {
+        if(reservedDateRepository.findByDate(date) != null) {
             throw Exception("Date already reserved")
         }
-        reservedDate.date = Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        reservedDate.date = date
         reservedDateRepository.save(reservedDate)
     }
-    suspend fun updateDateAvailable(id: Long, available: List<Json>) {
+    suspend fun updateDateAvailable(id: Long, available: Json) {
         val reservedDate = reservedDateRepository.findById(id) ?: return
         reservedDate.available = available
         reservedDateRepository.save(reservedDate)
@@ -124,8 +125,11 @@ class ReservedService {
     suspend fun getTimesetByDisplayName(displayName: String): ReservedTimeset? {
         return reservedTimesetRepository.findAllByDisplayName(displayName)
     }
-    suspend fun getDateByDate(date: String): ReservedDate? {
+    suspend fun getDateByDate(date: LocalDate): ReservedDate? {
         return reservedDateRepository.findByDate(date)
+    }
+    suspend fun getDateBetween(start: LocalDate, end: LocalDate): List<ReservedDate> {
+        return reservedDateRepository.findAllByDateBetween(start, end).toList()
     }
     suspend fun getRoomById(id: Long): ReservedRoom? {
         return reservedRoomRepository.findById(id)

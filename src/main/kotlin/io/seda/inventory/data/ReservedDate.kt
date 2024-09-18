@@ -12,10 +12,12 @@ import java.time.LocalDate
 data class ReservedDate(
     @Id
     var id: Long? = null,
-    var date: String,
-    var available: List<Json>
+    var date: LocalDate,
+    var available: Json
 )
 
 interface ReservedDateRepository: CoroutineCrudRepository<ReservedDate, Long> {
-    fun findByDate(date: String): ReservedDate?
+    fun findByDate(date: LocalDate): ReservedDate?
+    @Query("SELECT * FROM reserved_date WHERE date BETWEEN :start AND :end")
+    fun findAllByDateBetween(start: LocalDate, end: LocalDate): Flow<ReservedDate>
 }
