@@ -2,6 +2,7 @@ package io.seda.inventory.controller
 
 import io.r2dbc.postgresql.codec.Json
 import io.seda.inventory.data.ReservedDate
+import io.seda.inventory.data.ReservedSchedule
 import io.seda.inventory.services.ReservedService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -36,7 +38,17 @@ class ReservedController {
     suspend fun modifyRoom(@PathVariable("id") id: Long, @RequestBody request: RoomModifyRequest) = reservedService.updateRoom(id, request.displayName, request.maxStudent)
 
     @GetMapping("/schedule")
-    suspend fun getScheduleList() = reservedService.getAllSchedule()
+    suspend fun getScheduleList(
+        @RequestParam(value = "reqStudent", required = false) reqStudent: String?,
+        @RequestParam(value = "studentSum", required = false) studentSum: Int?,
+        @RequestParam(value = "pending", required = false) pending: Boolean?,
+        @RequestParam(value = "approved", required = false) approved: Boolean?,
+        @RequestParam(value = "reviewer", required = false) reviewer: String?,
+        @RequestParam(value = "reqTime", required = false) reqTime: Long?,
+        @RequestParam(value = "reqRoom", required = false) reqRoom: Long?,
+        @RequestParam(value = "timeset", required = false) timeset: List<Long>?,): List<ReservedSchedule> {
+        return reservedService.getScheduleByQuery(reqStudent, studentSum, pending, approved, reviewer, reqTime, reqRoom, timeset)
+    }
 
     @GetMapping("/schedule/{id}")
     suspend fun getScheduleDetail(@PathVariable("id") id: Long) = reservedService.getScheduleById(id)
@@ -80,11 +92,11 @@ class ReservedController {
     @GetMapping("/date")
     suspend fun getReservedDateList() = reservedService.getAllDate()
 
+    //dateTimestamp: yyyy-MM-dd
     @GetMapping("/date/date/{dateTimestamp}")
-    suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: Long): ReservedDate? {
+    suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: String): ReservedDate? {
         return reservedService.getDateByDate(dateTimestamp)
     }
-
     @GetMapping("/date/{id}")
     suspend fun getReservedDateDetail(@PathVariable("id") id: Long) = reservedService.getDateById(id)
 

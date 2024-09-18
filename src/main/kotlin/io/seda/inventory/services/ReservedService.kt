@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Service
 class ReservedService {
@@ -92,7 +93,7 @@ class ReservedService {
     }
     suspend fun createDate(date: Long, available: List<Json>) {
         val reservedDate = ReservedDate(
-            date = Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate(),
+            date = Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
             available = available
         )
         reservedDateRepository.save(reservedDate)
@@ -102,10 +103,10 @@ class ReservedService {
     }
     suspend fun updateDate(id: Long, date: Long) {
         val reservedDate = reservedDateRepository.findById(id) ?: return
-        if(reservedDateRepository.findByDate(Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate()) != null) {
+        if(reservedDateRepository.findByDate(Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))) != null) {
             throw Exception("Date already reserved")
         }
-        reservedDate.date = Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate()
+        reservedDate.date = Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         reservedDateRepository.save(reservedDate)
     }
     suspend fun updateDateAvailable(id: Long, available: List<Json>) {
@@ -113,20 +114,8 @@ class ReservedService {
         reservedDate.available = available
         reservedDateRepository.save(reservedDate)
     }
-    suspend fun getScheduleByRoom(reqRoom: Long): ReservedSchedule? {
-        return reservedScheduleRepository.findByReqRoom(reqRoom)
-    }
-    suspend fun getScheduleByReviewer(reviewer: String): ReservedSchedule? {
-        return reservedScheduleRepository.findAllByReviewer(reviewer)
-    }
-    suspend fun getScheduleByReqStudent(reqStudent: String): List<ReservedSchedule> {
-        return reservedScheduleRepository.findAllByReqStudent(reqStudent).toList()
-    }
-    suspend fun getScheduleByApproved(approved: Boolean): List<ReservedSchedule> {
-        return reservedScheduleRepository.findAllByApproved(approved).toList()
-    }
-    suspend fun getScheduleByPending(pending: Boolean): List<ReservedSchedule> {
-        return reservedScheduleRepository.findALlByPending(pending).toList()
+    suspend fun getScheduleByQuery(reqStudent: String?, studentSum: Int?, pending: Boolean?, approved: Boolean?, reviewer: String?, reqTime: Long?, reqRoom: Long?, timeset: List<Long>?): List<ReservedSchedule> {
+        return reservedScheduleRepository.findAllByReqStudentAndStudentSumAndPendingAndApprovedAndReviewerAndReqTimeAndReqRoomAndTimeset(reqStudent, studentSum, pending, approved, reviewer, reqTime, reqRoom, timeset)?.toList() ?: listOf()
     }
     suspend fun getRoomByDisplayName(displayName: String): ReservedRoom? {
         return reservedRoomRepository.findAllByDisplayName(displayName)
@@ -134,14 +123,8 @@ class ReservedService {
     suspend fun getTimesetByDisplayName(displayName: String): ReservedTimeset? {
         return reservedTimesetRepository.findAllByDisplayName(displayName)
     }
-    suspend fun getDateByDate(date: Long): ReservedDate? {
-        return reservedDateRepository.findByDate(Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate())
-    }
-    suspend fun getDateBetween(startDate: Long, endDate: Long): List<ReservedDate> {
-        return reservedDateRepository.findAllByDateRange(
-            Instant.ofEpochMilli(startDate).atZone(ZoneId.systemDefault()).toLocalDate(),
-            Instant.ofEpochMilli(endDate).atZone(ZoneId.systemDefault()).toLocalDate()
-        ).toList()
+    suspend fun getDateByDate(date: String): ReservedDate? {
+        return reservedDateRepository.findByDate(date)
     }
     suspend fun getRoomById(id: Long): ReservedRoom? {
         return reservedRoomRepository.findById(id)

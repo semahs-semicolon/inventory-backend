@@ -21,11 +21,16 @@ data class ReservedSchedule(
 )
 
 interface ReservedScheduleRepository: CoroutineCrudRepository<ReservedSchedule, Long> {
-    fun findByReqRoom(reqRoom: Long): ReservedSchedule?
-    fun findAllByApproved(approved: Boolean): Flow<ReservedSchedule>
-    fun findAllByReviewer(reviewer: String): ReservedSchedule?
-    fun findALlByPending(pending: Boolean): Flow<ReservedSchedule>
-    fun findAllByReqStudent(reqStudent: String): Flow<ReservedSchedule>
+    fun findAllByReqStudentAndStudentSumAndPendingAndApprovedAndReviewerAndReqTimeAndReqRoomAndTimeset(
+        reqStudent: String?,
+        studentSum: Int?,
+        pending: Boolean?,
+        approved: Boolean?,
+        reviewer: String?,
+        reqTime: Long?,
+        reqRoom: Long?,
+        timeset: List<Long>?
+    ): Flow<ReservedSchedule>?
     @Query("SELECT * FROM reserved_schedule WHERE req_time BETWEEN :start AND :end")
     fun findAllByReqTimeBetween(start: Long, end: Long): Flow<ReservedSchedule>
 }
