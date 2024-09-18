@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDate
 
 @RestController
 @RequestMapping("/reserved")
@@ -95,23 +96,25 @@ class ReservedController {
     //dateTimestamp: yyyy-MM-dd
     @GetMapping("/date/date/{dateTimestamp}")
     suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: String): ReservedDate? {
-        return reservedService.getDateByDate(dateTimestamp)
+        return reservedService.getDateByDate(LocalDate.parse(dateTimestamp))
     }
+    @GetMapping("/date/between/{start}/{end}")
+    suspend fun getReservedDateBetween(@PathVariable("start") start: String, @PathVariable("end") end: String) = reservedService.getDateBetween(LocalDate.parse(start), LocalDate.parse(end))
     @GetMapping("/date/{id}")
     suspend fun getReservedDateDetail(@PathVariable("id") id: Long) = reservedService.getDateById(id)
 
-    data class ReservedDateRequest(val date: Long)
+    data class ReservedDateRequest(val date: String, val available: Json?)
     @PutMapping("/date")
-    suspend fun createReservedDate(@RequestBody request: ReservedDateRequest) = reservedService.createDate(request.date, listOf(Json.of("{}")))
+    suspend fun createReservedDate(@RequestBody request: ReservedDateRequest) = reservedService.createDate(LocalDate.parse(request.date), request.available)
 
-    data class ReservedDateModifyAvailableRequest(val available: List<Json>)
+    data class ReservedDateModifyAvailableRequest(val available: Json)
     @PutMapping("/date/{id}")
     suspend fun modifyReservedDateAvailable(@PathVariable("id") id: Long, @RequestBody request: ReservedDateModifyAvailableRequest) = reservedService.updateDateAvailable(id, request.available)
 
-    data class ReservedDateModifyRequest(val date: Long)
+    data class ReservedDateModifyRequest(val date: String)
     @PostMapping("/date/{id}")
     suspend fun modifyReservedDate(@PathVariable("id") id: Long, @RequestBody request: ReservedDateModifyRequest) = run {
-        reservedService.updateDate(id, request.date)
+        reservedService.updateDate(id, LocalDate.parse(request.date))
     }
 
     @DeleteMapping("/date/{id}")
