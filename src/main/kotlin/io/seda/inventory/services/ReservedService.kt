@@ -114,8 +114,9 @@ class ReservedService {
         reservedDate.available = available
         reservedDateRepository.save(reservedDate)
     }
-    suspend fun getScheduleByQuery(reqStudent: String?, studentSum: Int?, pending: Boolean?, approved: Boolean?, reviewer: String?, reqTime: Long?, reqRoom: Long?, timeset: List<Long>?): List<ReservedSchedule> {
-        return reservedScheduleRepository.findAllByReqStudentAndStudentSumAndPendingAndApprovedAndReviewerAndReqTimeAndReqRoomAndTimeset(reqStudent, studentSum, pending, approved, reviewer, reqTime, reqRoom, timeset)?.toList() ?: listOf()
+    suspend fun getScheduleByQuery(reqStudent: String?, studentSum: Int?, pending: Boolean?, approved: Boolean?, reviewer: String?, reqTime: Long?, reqRoom: Long?): List<ReservedSchedule> {
+        return reservedScheduleRepository.findAllByReqStudentAndStudentSumAndPendingAndApprovedAndReviewerAndReqTimeAndReqRoom(reqStudent, studentSum, pending, approved, reviewer, reqTime, reqRoom)
+            .toList()
     }
     suspend fun getRoomByDisplayName(displayName: String): ReservedRoom? {
         return reservedRoomRepository.findAllByDisplayName(displayName)

@@ -45,9 +45,9 @@ class ReservedController {
         @RequestParam(value = "approved", required = false) approved: Boolean?,
         @RequestParam(value = "reviewer", required = false) reviewer: String?,
         @RequestParam(value = "reqTime", required = false) reqTime: Long?,
-        @RequestParam(value = "reqRoom", required = false) reqRoom: Long?,
-        @RequestParam(value = "timeset", required = false) timeset: List<Long>?,): List<ReservedSchedule> {
-        return reservedService.getScheduleByQuery(reqStudent, studentSum, pending, approved, reviewer, reqTime, reqRoom, timeset)
+        @RequestParam(value = "reqRoom", required = false) reqRoom: Long?
+    ): List<ReservedSchedule> {
+        return reservedService.getScheduleByQuery(reqStudent, studentSum, pending, approved, reviewer, reqTime, reqRoom)
     }
 
     @GetMapping("/schedule/{id}")
