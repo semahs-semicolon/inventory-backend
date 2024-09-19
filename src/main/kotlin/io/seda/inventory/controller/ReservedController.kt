@@ -6,6 +6,7 @@ import io.seda.inventory.data.ReservedDateSerializable
 import io.seda.inventory.data.ReservedSchedule
 import io.seda.inventory.services.ReservedService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -97,13 +98,11 @@ class ReservedController {
 
     //dateTimestamp: yyyy-MM-dd
     @GetMapping("/date/date/{dateTimestamp}")
-    suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: String): Mono<ReservedDateSerializable?> {
-        return reservedService.getDateByDate(LocalDate.parse(dateTimestamp))
+    suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: String): ResponseEntity<Mono<ReservedDateSerializable?>?> {
+        return ResponseEntity.ok(reservedService.getDateByDate(LocalDate.parse(dateTimestamp))
             .map {
-                println(it)
-                println(it.toSerializable())
                 it.toSerializable()
-            }
+            })
     }
     @GetMapping("/date/between/{start}/{end}")
     suspend fun getReservedDateBetween(@PathVariable("start") start: String, @PathVariable("end") end: String) = reservedService.getDateBetween(LocalDate.parse(start), LocalDate.parse(end))
