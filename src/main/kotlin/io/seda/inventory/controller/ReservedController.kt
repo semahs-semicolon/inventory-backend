@@ -97,9 +97,13 @@ class ReservedController {
 
     //dateTimestamp: yyyy-MM-dd
     @GetMapping("/date/date/{dateTimestamp}")
-    suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: String): Mono<ReservedDateSerializable> {
+    suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: String): Mono<ReservedDateSerializable?> {
         return reservedService.getDateByDate(LocalDate.parse(dateTimestamp))
-            .map { it.toSerializable() }
+            .map {
+                println(it)
+                println(it.toSerializable())
+                it.toSerializable()
+            }
     }
     @GetMapping("/date/between/{start}/{end}")
     suspend fun getReservedDateBetween(@PathVariable("start") start: String, @PathVariable("end") end: String) = reservedService.getDateBetween(LocalDate.parse(start), LocalDate.parse(end))

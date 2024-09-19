@@ -32,7 +32,8 @@ data class ReservedDate(
 }
 
 interface ReservedDateRepository: CoroutineCrudRepository<ReservedDate, Long> {
-    fun findFirstByDate(date: LocalDate): Mono<ReservedDate>
     @Query("SELECT * FROM reserved_date WHERE date BETWEEN :start AND :end")
     fun findAllByDateBetween(start: LocalDate, end: LocalDate): Flow<ReservedDate>
+    @Query("SELECT * FROM reserved_date WHERE date BETWEEN :date AND :date LIMIT 1;")
+    fun findOneByDate(date: LocalDate): Mono<ReservedDate>
 }
