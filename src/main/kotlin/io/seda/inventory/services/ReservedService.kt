@@ -106,7 +106,7 @@ class ReservedService {
     }
     suspend fun updateDate(id: Long, date: LocalDate) {
         val reservedDate = reservedDateRepository.findById(id) ?: return
-        if(reservedDateRepository.findFirstByDate(date).awaitFirstOrNull() != null) {
+        if(reservedDateRepository.findOneByDate(date).awaitFirstOrNull() != null) {
             throw Exception("Date already reserved")
         }
         reservedDate.date = date
@@ -128,7 +128,7 @@ class ReservedService {
         return reservedTimesetRepository.findAllByDisplayName(displayName)
     }
     suspend fun getDateByDate(date: LocalDate): Mono<ReservedDate> {
-        return reservedDateRepository.findFirstByDate(date)
+        return reservedDateRepository.findOneByDate(date)
     }
     suspend fun getDateBetween(start: LocalDate, end: LocalDate): List<ReservedDate> {
         return reservedDateRepository.findAllByDateBetween(start, end).toList()
