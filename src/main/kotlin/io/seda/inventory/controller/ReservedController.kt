@@ -41,7 +41,7 @@ class ReservedController {
     @PutMapping("/room/{id}")
     suspend fun modifyRoom(@PathVariable("id") id: Long, @RequestBody request: RoomModifyRequest) = reservedService.updateRoom(id, request.displayName, request.maxStudent)
 
-    @GetMapping("/room/{displayName}")
+    @GetMapping("/room/displayName/{displayName}")
     suspend fun getRoomByDisplayName(@PathVariable("displayName") displayName: String) = reservedService.getRoomByDisplayName(displayName)
 
     @GetMapping("/schedule")
