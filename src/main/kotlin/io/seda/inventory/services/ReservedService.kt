@@ -11,6 +11,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Optional
 
 @Service
 class ReservedService {
@@ -116,9 +117,26 @@ class ReservedService {
         reservedDate.available = available
         reservedDateRepository.save(reservedDate)
     }
-    suspend fun getScheduleByQuery(reqStudent: String?, studentSum: Int?, pending: Boolean?, approved: Boolean?, reviewer: String?, reqTime: Long?, reqRoom: Long?, reqDate: Long?): List<ReservedSchedule> {
-        return reservedScheduleRepository.findAllByReqStudentAndStudentSumAndPendingAndApprovedAndReviewerAndReqTimeAndReqRoomAndReqDate(reqStudent, studentSum, pending, approved, reviewer, reqTime, reqRoom, reqDate)
-            .toList()
+    suspend fun getScheduleByQuery(
+        reqStudent: String?,
+        studentSum: Int?,
+        pending: Boolean?,
+        approved: Boolean?,
+        reviewer: String?,
+        reqTime: Long?,
+        reqRoom: Long?,
+        reqDate: Long?
+    ): List<ReservedSchedule> {
+        return reservedScheduleRepository.findAllByReqStudentAndStudentSumAndPendingAndApprovedAndReviewerAndReqTimeAndReqRoomAndReqDate(
+            reqStudent?.let { Optional.of(it) } ?: Optional.empty(),
+            studentSum?.let { Optional.of(it) } ?: Optional.empty(),
+            pending?.let { Optional.of(it) } ?: Optional.empty(),
+            approved?.let { Optional.of(it) } ?: Optional.empty(),
+            reviewer?.let { Optional.of(it) } ?: Optional.empty(),
+            reqTime?.let { Optional.of(it) } ?: Optional.empty(),
+            reqRoom?.let { Optional.of(it) } ?: Optional.empty(),
+            reqDate?.let { Optional.of(it) } ?: Optional.empty()
+        ).toList()
     }
     suspend fun getRoomByDisplayName(displayName: String): ReservedRoom? {
         return reservedRoomRepository.findAllByDisplayName(displayName)
