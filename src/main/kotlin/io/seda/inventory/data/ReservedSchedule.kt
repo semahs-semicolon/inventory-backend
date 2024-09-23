@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
+import java.util.Optional
 
 @Table(name = "reserved_schedule")
 data class ReservedSchedule(
@@ -23,14 +24,14 @@ data class ReservedSchedule(
 
 interface ReservedScheduleRepository: CoroutineCrudRepository<ReservedSchedule, Long> {
     fun findAllByReqStudentAndStudentSumAndPendingAndApprovedAndReviewerAndReqTimeAndReqRoomAndReqDate(
-        reqStudent: String?,
-        studentSum: Int?,
-        pending: Boolean?,
-        approved: Boolean?,
-        reviewer: String?,
-        reqTime: Long?,
-        reqRoom: Long?,
-        reqDate: Long?
+        reqStudent: Optional<String>,
+        studentSum: Optional<Int>,
+        pending: Optional<Boolean>,
+        approved: Optional<Boolean>,
+        reviewer: Optional<String>,
+        reqTime: Optional<Long>,
+        reqRoom: Optional<Long>,
+        reqDate: Optional<Long>
     ): Flow<ReservedSchedule>
     @Query("SELECT * FROM reserved_schedule WHERE req_time BETWEEN :start AND :end")
     fun findAllByReqTimeBetween(start: Long, end: Long): Flow<ReservedSchedule>
