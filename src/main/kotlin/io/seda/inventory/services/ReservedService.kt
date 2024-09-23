@@ -19,7 +19,7 @@ class ReservedService {
     @Autowired lateinit var reservedDateRepository: ReservedDateRepository
     @Autowired lateinit var reservedScheduleRepository: ReservedScheduleRepository
 
-    suspend fun createSchedule(reqStudent: String, studentSum: Int, reqRoom: Long, timeset: List<Long>) {
+    suspend fun createSchedule(reqStudent: String, studentSum: Int, reqRoom: Long, timeset: List<Long>, reqDate: Long) {
         val schedule = ReservedSchedule(
             reqStudent = reqStudent,
             studentSum = studentSum,
@@ -28,19 +28,18 @@ class ReservedService {
             reqRoom = reqRoom,
             timeset = timeset,
             reviewer = null,
-            pending = true
+            pending = true,
+            reqDate = reqDate
         )
         reservedScheduleRepository.save(schedule)
     }
     suspend fun revokeSchedule(id: Long) {
         reservedScheduleRepository.deleteById(id)
     }
-    suspend fun updateSchedule(id: Long, reqStudent: String?, studentSum: Int?, reqRoom: Long?, timeset: List<Long>?) {
+    suspend fun updateSchedule(id: Long, reqStudent: String?, studentSum: Int?) {
         val schedule = reservedScheduleRepository.findById(id) ?: return
         schedule.reqStudent = reqStudent ?: schedule.reqStudent
         schedule.studentSum = studentSum ?: schedule.studentSum
-        schedule.reqRoom = reqRoom ?: schedule.reqRoom
-        schedule.timeset = timeset ?: schedule.timeset
         reservedScheduleRepository.save(schedule)
     }
     suspend fun approveSchedule(id: Long, reviewer: String) {
@@ -117,8 +116,8 @@ class ReservedService {
         reservedDate.available = available
         reservedDateRepository.save(reservedDate)
     }
-    suspend fun getScheduleByQuery(reqStudent: String?, studentSum: Int?, pending: Boolean?, approved: Boolean?, reviewer: String?, reqTime: Long?, reqRoom: Long?): List<ReservedSchedule> {
-        return reservedScheduleRepository.findAllByReqStudentAndStudentSumAndPendingAndApprovedAndReviewerAndReqTimeAndReqRoom(reqStudent, studentSum, pending, approved, reviewer, reqTime, reqRoom)
+    suspend fun getScheduleByQuery(reqStudent: String?, studentSum: Int?, pending: Boolean?, approved: Boolean?, reviewer: String?, reqTime: Long?, reqRoom: Long?, reqDate: Long?): List<ReservedSchedule> {
+        return reservedScheduleRepository.findAllByReqStudentAndStudentSumAndPendingAndApprovedAndReviewerAndReqTimeAndReqRoomAndReqDate(reqStudent, studentSum, pending, approved, reviewer, reqTime, reqRoom, reqDate)
             .toList()
     }
     suspend fun getRoomByDisplayName(displayName: String): ReservedRoom? {
