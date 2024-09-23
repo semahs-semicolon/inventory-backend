@@ -24,14 +24,14 @@ data class ReservedSchedule(
 
 interface ReservedScheduleRepository: CoroutineCrudRepository<ReservedSchedule, Long> {
     @Query("SELECT * FROM reserved_schedule WHERE " +
-            "(req_student IS NULL OR req_student = :reqStudent) " +
-            "AND (student_sum IS NULL OR student_sum = :studentSum) " +
-            "AND (pending IS NULL OR pending = :pending) " +
-            "AND (approved IS NULL OR approved = :approved) " +
-            "AND (reviewer IS NULL OR reviewer = :reviewer) " +
-            "AND (req_time IS NULL OR req_time = :reqTime) " +
-            "AND (req_room IS NULL OR req_room = :reqRoom) " +
-            "AND (req_date IS NULL OR req_date = :reqDate)"
+            "(:reqStudent IS NULL OR req_student = :reqStudent) " +
+            "AND (:studentSum IS NULL OR student_sum = :studentSum) " +
+            "AND (:pending IS NULL OR pending = :pending) " +
+            "AND (:approved IS NULL OR approved = :approved) " +
+            "AND (:reviewer IS NULL OR reviewer = :reviewer) " +
+            "AND (:reqTime IS NULL OR req_time = :reqTime) " +
+            "AND (:reqRoom IS NULL OR req_room = :reqRoom) " +
+            "AND (:reqDate IS NULL OR req_date = :reqDate)"
     )
     fun findReservedSchedules(
         reqStudent: String?,
