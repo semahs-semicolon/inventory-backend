@@ -18,10 +18,11 @@ data class ReservedSchedule(
     var reqTime: Long,
     var reqRoom: Long,
     var timeset: List<Long>,
+    var reqDate: Long,
 )
 
 interface ReservedScheduleRepository: CoroutineCrudRepository<ReservedSchedule, Long> {
-    fun findAllByReqStudentAndStudentSumAndPendingAndApprovedAndReviewerAndReqTimeAndReqRoom(
+    fun findAllByReqStudentAndStudentSumAndPendingAndApprovedAndReviewerAndReqTimeAndReqRoomAndReqDate(
         reqStudent: String?,
         studentSum: Int?,
         pending: Boolean?,
@@ -29,6 +30,7 @@ interface ReservedScheduleRepository: CoroutineCrudRepository<ReservedSchedule, 
         reviewer: String?,
         reqTime: Long?,
         reqRoom: Long?,
+        reqDate: Long?
     ): Flow<ReservedSchedule>
     @Query("SELECT * FROM reserved_schedule WHERE req_time BETWEEN :start AND :end")
     fun findAllByReqTimeBetween(start: Long, end: Long): Flow<ReservedSchedule>
