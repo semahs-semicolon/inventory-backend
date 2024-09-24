@@ -1,12 +1,10 @@
 package io.seda.inventory.controller
 
 import io.r2dbc.postgresql.codec.Json
-import io.seda.inventory.data.ReservedDate
 import io.seda.inventory.data.ReservedDateSerializable
 import io.seda.inventory.data.ReservedSchedule
 import io.seda.inventory.services.ReservedService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import reactor.core.publisher.Mono
 import java.time.LocalDate
 
 @RestController
@@ -97,21 +94,19 @@ class ReservedController {
     @PutMapping("/timeset/{id}")
     suspend fun modifyTimeset(@PathVariable("id") id: Long, @RequestBody request: TimesetModifyRequest) = reservedService.updateTimeset(id, request.startHour, request.startMinute, request.endHour, request.endMinute)
 
-    @GetMapping("/date")
-    suspend fun getReservedDateList() = reservedService.getAllDate()
+    @GetMapping("/date", produces = ["application/json"])
+    suspend fun getReservedDateList() = reservedService.getAllDate().forEach{it.toSerializable()}
 
-    @GetMapping("/date/date/{dateTimestamp}")
-    suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: String): ResponseEntity<Mono<ReservedDateSerializable?>?> {
-        return ResponseEntity.ok(reservedService.getDateByDate(LocalDate.parse(dateTimestamp))
-            .map {
-                it.toSerializable()
-            })
+    @GetMapping("/date/date/{dateTimestamp}", produces = ["application/json"])
+    suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: String): ReservedDateSerializable? {
+        return reservedService.getDateByDate(LocalDate.parse(dateTimestamp))?.toSerializable()
     }
-    @GetMapping("/date/between/{start}/{end}")
+    @GetMapping("/date/between/{start}/{end}", produces = ["application/json"])
     suspend fun getReservedDateBetween(@PathVariable("start") start: String, @PathVariable("end") end: String) = reservedService.getDateBetween(LocalDate.parse(start), LocalDate.parse(end))
-    @GetMapping("/date/{id}")
-    suspend fun getReservedDateDetail(@PathVariable("id") id: Long) = reservedService.getDateById(id)
-
+    @GetMapping("/date/{id}", produces = ["application/json"])
+    suspend fun getReservedDateDetail(@PathVariable("id") id: Long): ReservedDateSerializable? {
+        return reservedService.getDateById(id)?.toSerializable()
+    }
     data class ReservedDateRequest(val date: String, val available: Json?)
     @PutMapping("/date")
     suspend fun createReservedDate(@RequestBody request: ReservedDateRequest) = reservedService.createDate(LocalDate.parse(request.date), request.available)

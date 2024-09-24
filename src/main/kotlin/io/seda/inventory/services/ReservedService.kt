@@ -3,15 +3,10 @@ package io.seda.inventory.services
 import io.r2dbc.postgresql.codec.Json
 import io.seda.inventory.data.*
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
 import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Optional
 
 @Service
 class ReservedService {
@@ -106,7 +101,7 @@ class ReservedService {
     }
     suspend fun updateDate(id: Long, date: LocalDate) {
         val reservedDate = reservedDateRepository.findById(id) ?: return
-        if(reservedDateRepository.findOneByDate(date).awaitFirstOrNull() != null) {
+        if(reservedDateRepository.findOneByDate(date) != null) {
             throw Exception("Date already reserved")
         }
         reservedDate.date = date
@@ -133,7 +128,7 @@ class ReservedService {
     suspend fun getTimesetByDisplayName(displayName: String): ReservedTimeset? {
         return reservedTimesetRepository.findAllByDisplayName(displayName)
     }
-    suspend fun getDateByDate(date: LocalDate): Mono<ReservedDate> {
+    suspend fun getDateByDate(date: LocalDate): ReservedDate? {
         return reservedDateRepository.findOneByDate(date)
     }
     suspend fun getDateBetween(start: LocalDate, end: LocalDate): List<ReservedDate> {
