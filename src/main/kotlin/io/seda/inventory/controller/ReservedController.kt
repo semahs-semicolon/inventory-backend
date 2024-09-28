@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import reactor.core.publisher.Mono
 import java.time.LocalDate
 
 @RestController
@@ -98,8 +99,10 @@ class ReservedController {
     suspend fun getReservedDateList() = reservedService.getAllDate().forEach{it.toSerializable()}
 
     @GetMapping("/date/date/{dateTimestamp}", produces = ["application/json"])
-    suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: String): ReservedDateSerializable? {
-        return reservedService.getDateByDate(LocalDate.parse(dateTimestamp))?.toSerializable()
+    suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: String): Mono<ReservedDateSerializable> {
+        return reservedService.getDateByDate(LocalDate.parse(dateTimestamp)).map {
+            it.toSerializable()
+        }
     }
     @GetMapping("/date/between/{start}/{end}", produces = ["application/json"])
     suspend fun getReservedDateBetween(@PathVariable("start") start: String, @PathVariable("end") end: String) = reservedService.getDateBetween(LocalDate.parse(start), LocalDate.parse(end))

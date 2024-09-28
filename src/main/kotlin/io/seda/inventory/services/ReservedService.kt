@@ -5,6 +5,7 @@ import io.seda.inventory.data.*
 import kotlinx.coroutines.flow.toList
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Mono
 import java.time.Instant
 import java.time.LocalDate
 
@@ -128,7 +129,7 @@ class ReservedService {
     suspend fun getTimesetByDisplayName(displayName: String): ReservedTimeset? {
         return reservedTimesetRepository.findAllByDisplayName(displayName)
     }
-    suspend fun getDateByDate(date: LocalDate): ReservedDate? {
+    suspend fun getDateByDate(date: LocalDate): Mono<ReservedDate> {
         return reservedDateRepository.findOneByDate(date)
     }
     suspend fun getDateBetween(start: LocalDate, end: LocalDate): List<ReservedDate> {
