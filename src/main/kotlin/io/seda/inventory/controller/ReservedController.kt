@@ -116,7 +116,7 @@ class ReservedController {
         reservedService.getDateBetween(LocalDate.parse(start), LocalDate.parse(end)).map {
             it.toSerializable()
         }
-    @GetMapping("/date/{id}", consumes = [])
+    @GetMapping("/date/{id}", consumes = ["application/json"])
     suspend fun getReservedDateDetail(@PathVariable("id") id: Long): ReservedDateSerializable {
         return reservedService.getDateById(id)?.toSerializable() ?: throw NotFoundException("Date not found")
     }
