@@ -2,6 +2,7 @@ package io.seda.inventory.services
 
 import io.r2dbc.postgresql.codec.Json
 import io.seda.inventory.data.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -90,10 +91,10 @@ class ReservedService {
         timeset.endMinute = endMinute ?: timeset.endMinute
         reservedTimesetRepository.save(timeset)
     }
-    suspend fun createDate(date: LocalDate, available: Json?) {
+    suspend fun createDate(date: LocalDate, available: String?) {
         val reservedDate = ReservedDate(
             date = date,
-            available = available ?: Json.of("[]")
+            available = Json.of(available ?: "[]")
         )
         reservedDateRepository.save(reservedDate)
     }
@@ -108,9 +109,9 @@ class ReservedService {
         reservedDate.date = date
         reservedDateRepository.save(reservedDate)
     }
-    suspend fun updateDateAvailable(id: Long, available: Json) {
+    suspend fun updateDateAvailable(id: Long, available: String) {
         val reservedDate = reservedDateRepository.findById(id) ?: return
-        reservedDate.available = available
+        reservedDate.available = Json.of(available)
         reservedDateRepository.save(reservedDate)
     }
     suspend fun getScheduleByQuery(
@@ -126,14 +127,11 @@ class ReservedService {
     suspend fun getRoomByDisplayName(displayName: String): ReservedRoom? {
         return reservedRoomRepository.findAllByDisplayName(displayName)
     }
-    suspend fun getTimesetByDisplayName(displayName: String): ReservedTimeset? {
-        return reservedTimesetRepository.findAllByDisplayName(displayName)
-    }
-    suspend fun getDateByDate(date: LocalDate): ReservedDate? {
+    suspend fun getDateByDate(date: LocalDate): Mono<ReservedDate> {
         return reservedDateRepository.findOneByDate(date)
     }
-    suspend fun getDateBetween(start: LocalDate, end: LocalDate): List<ReservedDate> {
-        return reservedDateRepository.findAllByDateBetween(start, end).toList()
+    suspend fun getDateBetween(start: LocalDate, end: LocalDate): Flow<ReservedDate> {
+        return reservedDateRepository.findAllByDateBetween(start, end)
     }
     suspend fun getRoomById(id: Long): ReservedRoom? {
         return reservedRoomRepository.findById(id)
@@ -153,8 +151,8 @@ class ReservedService {
     suspend fun getAllTimeset(): List<ReservedTimeset> {
         return reservedTimesetRepository.findAll().toList()
     }
-    suspend fun getAllDate(): List<ReservedDate> {
-        return reservedDateRepository.findAll().toList()
+    suspend fun getAllDate(): Flow<ReservedDate> {
+        return reservedDateRepository.findAll()
     }
     suspend fun getAllSchedule(): List<ReservedSchedule> {
         return reservedScheduleRepository.findAll().toList()
