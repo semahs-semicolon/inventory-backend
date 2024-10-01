@@ -129,7 +129,7 @@ class ReservedService {
     suspend fun getTimesetByDisplayName(displayName: String): ReservedTimeset? {
         return reservedTimesetRepository.findAllByDisplayName(displayName)
     }
-    suspend fun getDateByDate(date: LocalDate): Mono<ReservedDate> {
+    suspend fun getDateByDate(date: LocalDate): ReservedDate? {
         return reservedDateRepository.findOneByDate(date)
     }
     suspend fun getDateBetween(start: LocalDate, end: LocalDate): List<ReservedDate> {
