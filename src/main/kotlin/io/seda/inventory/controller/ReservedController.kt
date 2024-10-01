@@ -1,11 +1,14 @@
 package io.seda.inventory.controller
 
 import io.r2dbc.postgresql.codec.Json
+import io.seda.inventory.data.ReservedDate
 import io.seda.inventory.data.ReservedDateSerializable
 import io.seda.inventory.data.ReservedSchedule
-import io.seda.inventory.exceptions.NotFoundException
 import io.seda.inventory.services.ReservedService
+import jakarta.ws.rs.NotFoundException
+import kotlinx.coroutines.flow.map
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -96,24 +99,33 @@ class ReservedController {
     @PutMapping("/timeset/{id}")
     suspend fun modifyTimeset(@PathVariable("id") id: Long, @RequestBody request: TimesetModifyRequest) = reservedService.updateTimeset(id, request.startHour, request.startMinute, request.endHour, request.endMinute)
 
-    @GetMapping("/date", produces = ["application/json"])
-    suspend fun getReservedDateList() = reservedService.getAllDate().forEach{it.toSerializable()}
+    @GetMapping("/date", consumes = ["application/json"])
+    suspend fun getReservedDateList() = reservedService.getAllDate().map {
+        it.toSerializable()
+    }
 
-    @GetMapping("/date/date/{dateTimestamp}", produces = ["application/json"])
-    suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: String): ReservedDateSerializable {
-        return reservedService.getDateByDate(LocalDate.parse(dateTimestamp))?.toSerializable() ?: throw NotFoundException("Date not found")
+    @GetMapping("/date/date/{dateTimestamp}", consumes = ["application/json"])
+    suspend fun getReservedDateByDate(@PathVariable("dateTimestamp") dateTimestamp: String): Mono<ReservedDateSerializable> {
+        return reservedService.getDateByDate(LocalDate.parse(dateTimestamp))
+            .map {
+                it.toSerializable()
+            }
     }
-    @GetMapping("/date/between/{start}/{end}", produces = ["application/json"])
-    suspend fun getReservedDateBetween(@PathVariable("start") start: String, @PathVariable("end") end: String) = reservedService.getDateBetween(LocalDate.parse(start), LocalDate.parse(end))
-    @GetMapping("/date/{id}", produces = ["application/json"])
-    suspend fun getReservedDateDetail(@PathVariable("id") id: Long): ReservedDateSerializable? {
-        return reservedService.getDateById(id)?.toSerializable()
+    @GetMapping("/date/between/{start}/{end}", consumes = ["application/json"])
+    suspend fun getReservedDateBetween(@PathVariable("start") start: String, @PathVariable("end") end: String) =
+        reservedService.getDateBetween(LocalDate.parse(start), LocalDate.parse(end)).map {
+            it.toSerializable()
+        }
+    @GetMapping("/date/{id}", consumes = [])
+    suspend fun getReservedDateDetail(@PathVariable("id") id: Long): ReservedDateSerializable {
+        return reservedService.getDateById(id)?.toSerializable() ?: throw NotFoundException("Date not found")
     }
-    data class ReservedDateRequest(val date: String, val available: Json?)
+
+    data class ReservedDateRequest(val date: String, val available: String?)
     @PutMapping("/date")
     suspend fun createReservedDate(@RequestBody request: ReservedDateRequest) = reservedService.createDate(LocalDate.parse(request.date), request.available)
 
-    data class ReservedDateModifyAvailableRequest(val available: Json)
+    data class ReservedDateModifyAvailableRequest(val available: String)
     @PutMapping("/date/{id}")
     suspend fun modifyReservedDateAvailable(@PathVariable("id") id: Long, @RequestBody request: ReservedDateModifyAvailableRequest) = reservedService.updateDateAvailable(id, request.available)
 
