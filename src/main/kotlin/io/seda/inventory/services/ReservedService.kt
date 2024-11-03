@@ -17,7 +17,7 @@ class ReservedService {
     @Autowired lateinit var reservedDateRepository: ReservedDateRepository
     @Autowired lateinit var reservedScheduleRepository: ReservedScheduleRepository
 
-    suspend fun createSchedule(reqStudent: String, studentSum: Int, reqRoom: Long, timeset: List<Long>, reqDate: Long) {
+    suspend fun createSchedule(reqStudent: String, studentSum: Int, reqRoom: Long, timeset: List<Long>, reqDate: Long, purpose: String) {
         val schedule = ReservedSchedule(
             reqStudent = reqStudent,
             studentSum = studentSum,
@@ -27,17 +27,21 @@ class ReservedService {
             timeset = timeset,
             reviewer = null,
             pending = true,
-            reqDate = reqDate
+            reqDate = reqDate,
+            purpose = purpose
         )
         reservedScheduleRepository.save(schedule)
     }
     suspend fun revokeSchedule(id: Long) {
         reservedScheduleRepository.deleteById(id)
     }
-    suspend fun updateSchedule(id: Long, reqStudent: String?, studentSum: Int?) {
+    suspend fun updateSchedule(id: Long, reqStudent: String?, studentSum: Int?, timeset: List<Long>?, reqRoom: Long?, purpose: String?) {
         val schedule = reservedScheduleRepository.findById(id) ?: return
         schedule.reqStudent = reqStudent ?: schedule.reqStudent
         schedule.studentSum = studentSum ?: schedule.studentSum
+        schedule.timeset = timeset ?: schedule.timeset
+        schedule.reqRoom = reqRoom ?: schedule.reqRoom
+        schedule.purpose = purpose ?: schedule.purpose
         reservedScheduleRepository.save(schedule)
     }
     suspend fun approveSchedule(id: Long, reviewer: String) {
@@ -122,8 +126,9 @@ class ReservedService {
         reviewer: String?,
         reqTime: Long?,
         reqRoom: Long?,
-        reqDate: Long?
-    ): List<ReservedSchedule> = reservedScheduleRepository.findReservedSchedules(reqStudent, studentSum, pending, approved, reviewer, reqTime, reqRoom, reqDate).toList()
+        reqDate: Long?,
+        purpose: String?
+    ): List<ReservedSchedule> = reservedScheduleRepository.findReservedSchedules(reqStudent, studentSum, pending, approved, reviewer, reqTime, reqRoom, reqDate, purpose).toList()
     suspend fun getRoomByDisplayName(displayName: String): ReservedRoom? {
         return reservedRoomRepository.findAllByDisplayName(displayName)
     }
