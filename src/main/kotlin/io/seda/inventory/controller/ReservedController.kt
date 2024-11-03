@@ -55,17 +55,18 @@ class ReservedController {
         @RequestParam(value = "reviewer", required = false) reviewer: String?,
         @RequestParam(value = "reqTime", required = false) reqTime: Long?,
         @RequestParam(value = "reqRoom", required = false) reqRoom: Long?,
-        @RequestParam(value = "reqDate", required = false) reqDate: Long?
+        @RequestParam(value = "reqDate", required = false) reqDate: Long?,
+        @RequestParam(value = "purpose", required = false) purpose: String?
     ): List<ReservedSchedule> {
-        return reservedService.getScheduleByQuery(reqStudent, studentSum, pending, approved, reviewer, reqTime, reqRoom, reqDate)
+        return reservedService.getScheduleByQuery(reqStudent, studentSum, pending, approved, reviewer, reqTime, reqRoom, reqDate, purpose)
     }
 
     @GetMapping("/schedule/{id}")
     suspend fun getScheduleDetail(@PathVariable("id") id: Long) = reservedService.getScheduleById(id)
 
-    data class ScheduleRequest(val reqStudent: String, val studentSum: Int, val reqRoom: Long, val timeset: List<Long>, val reqDate: Long)
+    data class ScheduleRequest(val reqStudent: String, val studentSum: Int, val reqRoom: Long, val timeset: List<Long>, val reqDate: Long, val purpose: String)
     @PutMapping("/schedule")
-    suspend fun createSchedule(@RequestBody request: ScheduleRequest) = reservedService.createSchedule(request.reqStudent, request.studentSum, request.reqRoom, request.timeset, request.reqDate)
+    suspend fun createSchedule(@RequestBody request: ScheduleRequest) = reservedService.createSchedule(request.reqStudent, request.studentSum, request.reqRoom, request.timeset, request.reqDate, request.purpose)
 
     @DeleteMapping("/schedule/{id}")
     suspend fun revokeSchedule(@PathVariable("id") id: Long) = reservedService.revokeSchedule(id)
@@ -77,9 +78,9 @@ class ReservedController {
     @PostMapping("/schedule/{id}/reject")
     suspend fun rejectSchedule(@PathVariable("id") id: Long,  @RequestBody request: ReviewerRequest) = reservedService.rejectSchedule(id, request.reviewer)
 
-    data class ScheduleModifyRequest(val reqStudent: String?, val studentSum: Int?)
+    data class ScheduleModifyRequest(val reqStudent: String?, val studentSum: Int?, val timeset: List<Long>?, val reqRoom: Long?, val purpose: String?)
     @PutMapping("/schedule/{id}")
-    suspend fun modifySchedule(@PathVariable("id") id: Long, @RequestBody request: ScheduleModifyRequest) = reservedService.updateSchedule(id, request.reqStudent, request.studentSum)
+    suspend fun modifySchedule(@PathVariable("id") id: Long, @RequestBody request: ScheduleModifyRequest) = reservedService.updateSchedule(id, request.reqStudent, request.studentSum, request.timeset, request.reqRoom, request.purpose)
 
     @GetMapping("/timeset")
     suspend fun getTimesetList() = reservedService.getAllTimeset()
