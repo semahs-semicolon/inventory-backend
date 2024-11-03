@@ -52,13 +52,12 @@ class ReservedController {
         @RequestParam(value = "studentSum", required = false) studentSum: Int?,
         @RequestParam(value = "pending", required = false) pending: Boolean?,
         @RequestParam(value = "approved", required = false) approved: Boolean?,
-        @RequestParam(value = "reviewer", required = false) reviewer: String?,
         @RequestParam(value = "reqTime", required = false) reqTime: Long?,
         @RequestParam(value = "reqRoom", required = false) reqRoom: Long?,
         @RequestParam(value = "reqDate", required = false) reqDate: Long?,
         @RequestParam(value = "purpose", required = false) purpose: String?
     ): List<ReservedSchedule> {
-        return reservedService.getScheduleByQuery(reqStudent, studentSum, pending, approved, reviewer, reqTime, reqRoom, reqDate, purpose)
+        return reservedService.getScheduleByQuery(reqStudent, studentSum, pending, approved, reqTime, reqRoom, reqDate, purpose)
     }
 
     @GetMapping("/schedule/{id}")
@@ -71,12 +70,11 @@ class ReservedController {
     @DeleteMapping("/schedule/{id}")
     suspend fun revokeSchedule(@PathVariable("id") id: Long) = reservedService.revokeSchedule(id)
 
-    data class ReviewerRequest(val reviewer: String)
     @PostMapping("/schedule/{id}/approve")
-    suspend fun approveSchedule(@PathVariable("id") id: Long, @RequestBody request: ReviewerRequest) = reservedService.approveSchedule(id, request.reviewer)
+    suspend fun approveSchedule(@PathVariable("id") id: Long) = reservedService.approveSchedule(id)
 
     @PostMapping("/schedule/{id}/reject")
-    suspend fun rejectSchedule(@PathVariable("id") id: Long,  @RequestBody request: ReviewerRequest) = reservedService.rejectSchedule(id, request.reviewer)
+    suspend fun rejectSchedule(@PathVariable("id") id: Long) = reservedService.rejectSchedule(id)
 
     data class ScheduleModifyRequest(val reqStudent: String?, val studentSum: Int?, val timeset: List<Long>?, val reqRoom: Long?, val purpose: String?)
     @PutMapping("/schedule/{id}")
