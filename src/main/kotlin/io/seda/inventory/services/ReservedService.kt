@@ -25,7 +25,6 @@ class ReservedService {
             reqTime = Instant.now().epochSecond,
             reqRoom = reqRoom,
             timeset = timeset,
-            reviewer = null,
             pending = true,
             reqDate = reqDate,
             purpose = purpose
@@ -44,18 +43,16 @@ class ReservedService {
         schedule.purpose = purpose ?: schedule.purpose
         reservedScheduleRepository.save(schedule)
     }
-    suspend fun approveSchedule(id: Long, reviewer: String) {
+    suspend fun approveSchedule(id: Long) {
         val schedule = reservedScheduleRepository.findById(id) ?: return
         schedule.approved = true
         schedule.pending = false
-        schedule.reviewer = reviewer
         reservedScheduleRepository.save(schedule)
     }
-    suspend fun rejectSchedule(id: Long, reviewer: String) {
+    suspend fun rejectSchedule(id: Long) {
         val schedule = reservedScheduleRepository.findById(id) ?: return
         schedule.approved = false
         schedule.pending = false
-        schedule.reviewer = reviewer
         reservedScheduleRepository.save(schedule)
     }
     suspend fun createRoom(displayName: String, maxStudent: Int) {
@@ -123,12 +120,11 @@ class ReservedService {
         studentSum: Int?,
         pending: Boolean?,
         approved: Boolean?,
-        reviewer: String?,
         reqTime: Long?,
         reqRoom: Long?,
         reqDate: Long?,
         purpose: String?
-    ): List<ReservedSchedule> = reservedScheduleRepository.findReservedSchedules(reqStudent, studentSum, pending, approved, reviewer, reqTime, reqRoom, reqDate, purpose).toList()
+    ): List<ReservedSchedule> = reservedScheduleRepository.findReservedSchedules(reqStudent, studentSum, pending, approved, reqTime, reqRoom, reqDate, purpose).toList()
     suspend fun getRoomByDisplayName(displayName: String): ReservedRoom? {
         return reservedRoomRepository.findAllByDisplayName(displayName)
     }
